@@ -1,0 +1,9 @@
+.message{
+    background: #e4e6eb;
+    border-radius: 12px;
+    padding: 8px;
+    margin: 8px;
+    width: fit-content;
+    max-width: 300px;
+    overflow-wrap: anywhere; //normal-break_word-anywhere
+}
