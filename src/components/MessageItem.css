@@ -7,3 +7,11 @@
     max-width: 300px;
     overflow-wrap: anywhere; //normal-break_word-anywhere
 }
+
+.message-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 0 24px;
+    box-sizing: border-box;
+    display: flex;
+}
