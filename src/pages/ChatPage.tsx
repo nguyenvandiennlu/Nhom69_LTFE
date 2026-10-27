@@ -13,7 +13,7 @@ export default function ChatPage() {
             <Sidebar />
             <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <header>Trạng thái: {status}</header>
-                <MessageList messages={messages} />
+                <MessageList messages={messages} username={username}/>
                 <ChatInput onSend={(text) => send(username, text)} />
             </main>
         </div>
