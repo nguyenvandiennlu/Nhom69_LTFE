@@ -13,7 +13,7 @@ export default function MessageList({ messages, username }: Props) {
         if(bottomRef.current) bottomRef.current.scrollIntoView();
     }, [messages]);
     return (
-        <div style={{ flex: 1, overflowY: 'auto' }}>
+        <div className="flex-grow-1 overflow-auto">
             {messages.map((m) => (
                 <MessageItem key={m.id} message={m} isOwn={m.user === username} />
             ))}
