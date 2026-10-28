@@ -5,7 +5,7 @@
     margin: 8px;
     width: fit-content;
     max-width: 300px;
-    overflow-wrap: anywhere; //normal-break_word-anywhere
+    overflow-wrap: anywhere; /* normal break_word anywhere */
 }
 
 .message-container {
