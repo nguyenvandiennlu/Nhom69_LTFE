@@ -9,10 +9,10 @@ export default function ChatPage() {
     const username = 'PIGGY';
 
     return (
-        <div style={{ display: 'flex', height: '100vh' }}>
+        <div className="d-flex vh-100">
             <Sidebar />
-            <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <header>Trạng thái: {status}</header>
+            <main className="chat-main d-flex flex-column flex-grow-1">
+                <header className="chat-main__header">Trạng thái: {status}</header>
                 <MessageList messages={messages} username={username}/>
                 <ChatInput onSend={(text) => send(username, text)} />
             </main>
