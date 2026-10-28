@@ -17,7 +17,7 @@ export default function MessageItem({ message, isOwn }: Props) {
                     <div className="message" style={{background: isOwn ? '#d1e7ff' : '#e4e6eb'}}>
                         {message.text}
                         <div style={{fontSize: 11, opacity: 0.7}}>
-                            {new Date(message.time).toLocaleString('vi-VN', {hour: '2-digit', minute: '2-digit', second: '2-digit'})}
+                            {new Date(message.time).toLocaleString('vi-VN', {hour: '2-digit', minute: '2-digit'})}
                         </div>
                     </div>
                 </div>
