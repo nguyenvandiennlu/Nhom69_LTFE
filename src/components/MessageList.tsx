@@ -1,5 +1,5 @@
 import type { Message } from '../types/message';
-import {useEffect, useRef} from "react";
+import {Fragment, useEffect, useRef} from "react";
 import MessageItem from './MessageItem';
 
 interface Props {
@@ -13,10 +13,33 @@ export default function MessageList({ messages, username }: Props) {
         if(bottomRef.current) bottomRef.current.scrollIntoView();
     }, [messages]);
     return (
-        <div className="flex-grow-1 overflow-auto">
-            {messages.map((m) => (
-                <MessageItem key={m.id} message={m} isOwn={m.user === username} />
-            ))}
+        <div className="message-list flex-grow-1 overflow-auto">
+            {messages.map((m, i) => {
+                const day = new Date(m.time).toLocaleDateString("vi-VN", {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                })
+                let prevDay = '';
+                if (i > 0) {
+                    prevDay = new Date(messages[i - 1].time).toLocaleDateString('vi-VN', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    });
+                }
+                let dividerElement = null;
+                if (day !== prevDay) {
+                    dividerElement = <div className="message-list__divider">{day}</div>;
+                }
+
+                return (
+                    <Fragment key={m.id}>
+                        {dividerElement}
+                        <MessageItem message={m} isOwn={m.user === username} />
+                    </Fragment>
+                );
+            })}
             <div ref={bottomRef}></div>
         </div>
     );
