@@ -76,6 +76,10 @@ $dis-input: #383a40;
   &__text {
     overflow-wrap: anywhere;
   }
+  &__spacer {
+    width: 40px;
+    flex-shrink: 0;
+  }
 }
 
 

@@ -33,10 +33,15 @@ export default function MessageList({ messages, username }: Props) {
                     dividerElement = <div className="message-list__divider">{day}</div>;
                 }
 
+                let isGrouped = false;
+                if (i > 0 && m.user === messages[i - 1].user && day === prevDay) {
+                    isGrouped = true;
+                }
+
                 return (
                     <Fragment key={m.id}>
                         {dividerElement}
-                        <MessageItem message={m} isOwn={m.user === username} />
+                        <MessageItem message={m} isOwn={m.user === username} isGrouped={isGrouped}/>
                     </Fragment>
                 );
             })}
