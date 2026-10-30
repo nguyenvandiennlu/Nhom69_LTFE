@@ -7,7 +7,7 @@ $dis-rail: #1e1f22;
 $dis-sidebar: #2b2d31;
 $dis-input: #383a40;
 
-@import 'bootstrap/scss/bootstrap';
+@use 'bootstrap/scss/bootstrap';
 
 // ChatPage.tsx
 .chat-main{
@@ -17,9 +17,33 @@ $dis-input: #383a40;
     font-weight: 600;
     border-bottom: 3px solid rgba(0, 0, 0, 0.3);
   }
+  &__title {
+    font-weight: 600;
+  }
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+
+    &--connecting {
+      background: #f0b232;
+    }
+    &--open {
+      background: #23a55a;
+    }
+    &--closed {
+      background: #f23f43;
+    }
+  }
+
+  &__status {
+    font-size: 12px;
+    font-weight: 400;
+    color: #949ba4;
+  }
 }
 
-// MessageList.tsx
+// MessageItem.tsx
 .message{
   &:hover {
     background: rgba(0, 0, 0, 0.06);
@@ -52,7 +76,12 @@ $dis-input: #383a40;
   &__text {
     overflow-wrap: anywhere;
   }
+  &__spacer {
+    width: 40px;
+    flex-shrink: 0;
+  }
 }
+
 
 // ChatInput.tsx
 .chat-input {
@@ -69,6 +98,27 @@ $dis-input: #383a40;
 
     &::placeholder {
       color: #949ba4;
+    }
+  }
+}
+
+// MessageList.txs
+.message-list {
+  &__divider {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #949ba4;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
     }
   }
 }

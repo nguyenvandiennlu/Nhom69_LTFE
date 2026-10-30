@@ -1,27 +1,35 @@
-import type { Message } from '../types/message';
+import type {Message} from '../types/message';
 
 interface Props {
     message: Message;
     isOwn: boolean;
+    isGrouped: boolean;
 }
 
-export default function MessageItem({ message, isOwn }: Props) {
+export default function MessageItem({message, isOwn, isGrouped}: Props) {
     return (
-        <div className="message d-flex gap-3 px-3 py-2">
-            <div className="message__avatar">
-                {message.user.charAt(0).toUpperCase()}
-            </div>
+        <div className={isGrouped ? "message d-flex gap-3 px-3 py-0" : "message d-flex gap-3 px-3 py-2"}>
+            {isGrouped ?
+                (<div className="message__spacer"></div>)
+                :
+                (<div className="message__avatar">
+                    {message.user.charAt(0).toUpperCase()}
+                </div>)
+            }
 
             <div className="message__body">
-                <div>
-                    <span className={isOwn ? 'message__name message__name--own' : 'message__name'}>
-                        {message.user}
-                    </span>
-                    <span className="message__time ms-2">
-                        {new Date(message.time).toLocaleString('vi-VN', {hour: '2-digit', minute: '2-digit'})}
-                    </span>
-                    <div className="message__text">{message.text}</div>
-                </div>
+                {!isGrouped && (
+                    <div>
+                        <span className={isOwn ? 'message__name message__name--own' : 'message__name'}>
+                            {message.user}
+                        </span>
+                        <span className="message__time ms-2">
+                            {new Date(message.time).toLocaleString('vi-VN', {hour: '2-digit', minute: '2-digit'})}
+                        </span>
+                    </div>
+                    )
+                }
+                <div className="message__text">{message.text}</div>
             </div>
 
         </div>
