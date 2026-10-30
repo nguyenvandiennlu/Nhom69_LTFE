@@ -127,4 +127,17 @@ $dis-input: #383a40;
       background: rgba(255, 255, 255, 0.1);
     }
   }
+  &__empty {
+    padding-top: 32px;
+  }
+  &__empty-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: $dis-input;
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

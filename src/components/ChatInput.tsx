@@ -21,9 +21,9 @@ export default function ChatInput({ onSend }: Props) {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                    placeholder="Nhập tin nhắn..."
+                    placeholder="Nhắn #chat-chung"
                 />
-                <button className="btn btn-primary btn-sm" onClick={handleSend}>Gửi</button>
+                <button className="btn btn-primary btn-sm" onClick={handleSend} disabled={!text.trim()}>Gửi</button>
             </div>
         </div>
     );
