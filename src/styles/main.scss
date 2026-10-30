@@ -2,12 +2,19 @@ $body-bg-dark: #313338;
 $body-color-dark: #dbdee1;
 $primary: #5865f2;
 
-
 $dis-rail: #1e1f22;
 $dis-sidebar: #2b2d31;
 $dis-input: #383a40;
 
 @use 'bootstrap/scss/bootstrap';
+
+
+// Avatar color
+.message__avatar--0 { background: #5865f2; }
+.message__avatar--1 { background: #3ba55d; }
+.message__avatar--2 { background: #eb459e; }
+.message__avatar--3 { background: #e67e22; }
+.message__avatar--4 { background: #ed4245; }
 
 // ChatPage.tsx
 .chat-main{
@@ -45,6 +52,7 @@ $dis-input: #383a40;
 
 // MessageItem.tsx
 .message{
+  position: relative;
   &:hover {
     background: rgba(0, 0, 0, 0.06);
   }
@@ -53,7 +61,6 @@ $dis-input: #383a40;
     height: 40px;
     flex-shrink: 0;
     border-radius: 50%;
-    background: $primary;
     color: white;
     font-weight: 600;
     display: flex;
@@ -75,6 +82,35 @@ $dis-input: #383a40;
   }
   &__text {
     overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+  &__toolbar {
+    display: none;
+    position: absolute;
+    top: -14px;
+    right: 16px;
+    background: $dis-sidebar;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 2px;
+  }
+  &:hover &__toolbar {
+    display: flex;
+  }
+  &__action {
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #b5bac1;
+    cursor: pointer;
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    &--danger:hover {
+      color: #f23f43;
+    }
   }
   &__spacer {
     width: 40px;
@@ -95,9 +131,31 @@ $dis-input: #383a40;
     border: none;
     outline: none;
     color: inherit;
+    resize: none;
+    font: inherit;
+    max-height: 150px;
+    field-sizing: content;
+    scrollbar-width: thin;
+    scrollbar-color: #1a1b1e transparent;
 
     &::placeholder {
       color: #949ba4;
+    }
+  }
+  &__icon {
+    background: transparent;
+    border: none;
+    padding: 0 4px;
+    font-size: 20px;
+    line-height: 1;
+    color: #b5bac1;
+    cursor: pointer;
+    &:hover {
+      color: #fff;
+    }
+    &--gif {
+      font-size: 12px;
+      font-weight: 700;
     }
   }
 }
@@ -120,5 +178,18 @@ $dis-input: #383a40;
       height: 1px;
       background: rgba(255, 255, 255, 0.1);
     }
+  }
+  &__empty {
+    padding-top: 32px;
+  }
+  &__empty-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: $dis-input;
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
