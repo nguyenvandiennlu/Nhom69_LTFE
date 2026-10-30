@@ -16,14 +16,23 @@ export default function ChatInput({ onSend }: Props) {
     return (
         <div className="chat-input px-3 pb-3">
             <div className="chat-input__bar d-flex align-items-center gap-2">
-                <input
+                <button className="chat-input__icon" title="Đính kèm">+</button>
+                <textarea
                     className="chat-input__field flex-grow-1"
+                    rows={1}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                    placeholder="Nhập tin nhắn..."
+                    onKeyDown={(e) => {
+                        if(e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSend();
+                        }
+                    }}
+                    placeholder="Nhắn #chat-chung"
                 />
-                <button className="btn btn-primary btn-sm" onClick={handleSend}>Gửi</button>
+                <button className="chat-input__icon chat-input__icon--gif" title="GIF">GIF</button>
+                <button className="chat-input__icon" title="Emoji">😊</button>
+                <button className="btn btn-primary btn-sm" onClick={handleSend} disabled={!text.trim()}>Gửi</button>
             </div>
         </div>
     );

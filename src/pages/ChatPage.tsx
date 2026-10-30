@@ -19,7 +19,8 @@ export default function ChatPage() {
                 </header>
 
                 <MessageList messages={messages} username={username}/>
-                <ChatInput onSend={(text) => send(username, text)} />
+                {/*<ChatInput onSend={(text) => send(username, text)} />*/}
+                <ChatInput onSend={(text) => send(['An', 'Bình', 'Chi', 'An'][Math.floor(Math.random() * 4)], text)} />
             </main>
         </div>
     );
