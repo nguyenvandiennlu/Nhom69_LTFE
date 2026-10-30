@@ -14,6 +14,11 @@ export default function MessageList({ messages, username }: Props) {
     }, [messages]);
     return (
         <div className="message-list flex-grow-1 overflow-auto">
+            <div className="message-list__empty px-3">
+                <div className="message-list__empty-icon">#</div>
+                <h4 className="fw-bold mt-3 mb-1">Chào mừng đến #chat-chung</h4>
+                <p className="text-secondary">Đây là khởi đầu của kênh #chat-chung. Hãy gửi tin nhắn đầu tiên!</p>
+            </div>
             {messages.map((m, i) => {
                 const day = new Date(m.time).toLocaleDateString("vi-VN", {
                     day: 'numeric',
