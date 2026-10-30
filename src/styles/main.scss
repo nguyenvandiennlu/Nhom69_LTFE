@@ -106,6 +106,22 @@ $dis-input: #383a40;
       color: #949ba4;
     }
   }
+  &__icon {
+    background: transparent;
+    border: none;
+    padding: 0 4px;
+    font-size: 20px;
+    line-height: 1;
+    color: #b5bac1;
+    cursor: pointer;
+    &:hover {
+      color: #fff;
+    }
+    &--gif {
+      font-size: 12px;
+      font-weight: 700;
+    }
+  }
 }
 
 // MessageList.txs
