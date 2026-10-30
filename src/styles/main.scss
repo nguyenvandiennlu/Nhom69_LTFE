@@ -81,6 +81,7 @@ $dis-input: #383a40;
   }
   &__text {
     overflow-wrap: anywhere;
+    white-space: pre-wrap;
   }
   &__spacer {
     width: 40px;
@@ -101,6 +102,12 @@ $dis-input: #383a40;
     border: none;
     outline: none;
     color: inherit;
+    resize: none;
+    font: inherit;
+    max-height: 150px;
+    field-sizing: content;
+    scrollbar-width: thin;
+    scrollbar-color: #1a1b1e transparent;
 
     &::placeholder {
       color: #949ba4;

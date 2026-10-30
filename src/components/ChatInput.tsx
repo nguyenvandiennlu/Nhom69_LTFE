@@ -17,11 +17,17 @@ export default function ChatInput({ onSend }: Props) {
         <div className="chat-input px-3 pb-3">
             <div className="chat-input__bar d-flex align-items-center gap-2">
                 <button className="chat-input__icon" title="Đính kèm">+</button>
-                <input
+                <textarea
                     className="chat-input__field flex-grow-1"
+                    rows={1}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                    onKeyDown={(e) => {
+                        if(e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSend();
+                        }
+                    }}
                     placeholder="Nhắn #chat-chung"
                 />
                 <button className="chat-input__icon chat-input__icon--gif" title="GIF">GIF</button>
