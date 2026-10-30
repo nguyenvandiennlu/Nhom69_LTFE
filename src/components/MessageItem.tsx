@@ -7,12 +7,13 @@ interface Props {
 }
 
 export default function MessageItem({message, isOwn, isGrouped}: Props) {
+    const colorIndex = message.user.charCodeAt(0) % 5;
     return (
         <div className={isGrouped ? "message d-flex gap-3 px-3 py-0" : "message d-flex gap-3 px-3 py-2"}>
             {isGrouped ?
                 (<div className="message__spacer"></div>)
                 :
-                (<div className="message__avatar">
+                (<div className={`message__avatar message__avatar--${colorIndex}`}>
                     {message.user.charAt(0).toUpperCase()}
                 </div>)
             }

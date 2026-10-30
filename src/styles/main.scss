@@ -2,12 +2,19 @@ $body-bg-dark: #313338;
 $body-color-dark: #dbdee1;
 $primary: #5865f2;
 
-
 $dis-rail: #1e1f22;
 $dis-sidebar: #2b2d31;
 $dis-input: #383a40;
 
 @use 'bootstrap/scss/bootstrap';
+
+
+// Avatar color
+.message__avatar--0 { background: #5865f2; }
+.message__avatar--1 { background: #3ba55d; }
+.message__avatar--2 { background: #eb459e; }
+.message__avatar--3 { background: #e67e22; }
+.message__avatar--4 { background: #ed4245; }
 
 // ChatPage.tsx
 .chat-main{
@@ -53,7 +60,6 @@ $dis-input: #383a40;
     height: 40px;
     flex-shrink: 0;
     border-radius: 50%;
-    background: $primary;
     color: white;
     font-weight: 600;
     display: flex;
