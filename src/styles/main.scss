@@ -52,6 +52,7 @@ $dis-input: #383a40;
 
 // MessageItem.tsx
 .message{
+  position: relative;
   &:hover {
     background: rgba(0, 0, 0, 0.06);
   }
@@ -82,6 +83,34 @@ $dis-input: #383a40;
   &__text {
     overflow-wrap: anywhere;
     white-space: pre-wrap;
+  }
+  &__toolbar {
+    display: none;
+    position: absolute;
+    top: -14px;
+    right: 16px;
+    background: $dis-sidebar;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 2px;
+  }
+  &:hover &__toolbar {
+    display: flex;
+  }
+  &__action {
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #b5bac1;
+    cursor: pointer;
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    &--danger:hover {
+      color: #f23f43;
+    }
   }
   &__spacer {
     width: 40px;

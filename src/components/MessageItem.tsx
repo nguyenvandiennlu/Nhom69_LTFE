@@ -33,6 +33,12 @@ export default function MessageItem({message, isOwn, isGrouped}: Props) {
                 <div className="message__text">{message.text}</div>
             </div>
 
+            <div className="message__toolbar">
+                <button className="message__action" title="Trả lời">⤷</button>
+                <button className="message__action" title="Sao chép">⎘</button>
+                <button className="message__action message__action--danger" title="Xóa">✕</button>
+            </div>
+
         </div>
     );
 }
