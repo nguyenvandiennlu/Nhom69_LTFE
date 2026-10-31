@@ -1,0 +1,56 @@
+$dis-sidebar: #2b2d31;
+
+//Sidebar.tsx
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  padding: 8px;
+  background: $dis-sidebar;
+  color: #949ba4;
+}
+
+.titleSidebar {
+  display: flex;
+  padding: 16px 8px 4px;
+  font-size: 20px;
+  font-weight: 600;
+  justify-content: space-between;
+
+}
+
+.titleSidebar:first-child {
+  cursor: pointer;
+}
+
+.room {
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: white;
+  }
+}
+
+.roomActive,
+.roomActive:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  color: white;
+}
+
+.dotSidebar {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: green;
+}
