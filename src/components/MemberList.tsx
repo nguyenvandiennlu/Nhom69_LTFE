@@ -1,4 +1,5 @@
 import { mockMembers } from '../types/TempMember';
+import MemberItem from './MemberItem';
 
 export default function MemberList() {
     const onlineMembers = mockMembers.filter((m) => m.status !== 'offline');
@@ -10,14 +11,14 @@ export default function MemberList() {
                 Trực tuyến — {onlineMembers.length}
             </div>
             {onlineMembers.map((m) => (
-                <div key={m.id}>{m.name}</div>
+                <MemberItem key={m.id} member={m} />
             ))}
 
             <div className="member-list__group-title">
                 Ngoại tuyến — {offlineMembers.length}
             </div>
             {offlineMembers.map((m) => (
-                <div key={m.id}>{m.name}</div>
+                <MemberItem key={m.id} member={m} />
             ))}
         </aside>
     );

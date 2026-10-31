@@ -208,3 +208,29 @@ $dis-input: #383a40;
     padding: 16px 8px 4px;
   }
 }
+
+// MemberItem.tsx
+.member {
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &--0 { background: #5865f2; }
+    &--1 { background: #3ba55d; }
+    &--2 { background: #eb459e; }
+    &--3 { background: #e67e22; }
+    &--4 { background: #ed4245; }
+  }
+
+  &__name {
+    font-weight: 500;
+    color: #dbdee1;
+  }
+}
