@@ -8,7 +8,7 @@ export default function MemberItem({ member }: Props) {
     const colorIndex = member.name.charCodeAt(0) % 5;
 
     return (
-        <div className="member d-flex align-items-center gap-2 px-2 py-1">
+        <div className={`member d-flex align-items-center gap-2 px-2 py-1 ${member.status === 'offline' ? 'member--offline' : ''}`}>
             <div className={`member__avatar member__avatar--${colorIndex}`}>
                 {member.name.charAt(0).toUpperCase()}
                 <span className={`member__dot member__dot--${member.status}`}></span>

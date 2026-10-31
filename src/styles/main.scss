@@ -207,10 +207,43 @@ $dis-input: #383a40;
     color: #949ba4;
     padding: 16px 8px 4px;
   }
+  &__search {
+    margin: -16px -8px 0;
+    padding: 12px 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  }
+  &__search-box {
+    background: $dis-rail;
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: #949ba4;
+  }
+  &__search-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #dbdee1;
+    font-size: 14px;
+    min-width: 0;
+    &::placeholder {
+      color: #949ba4;
+    }
+  }
 }
 
 // MemberItem.tsx
 .member {
+  border-radius: 4px;
+  cursor: pointer;
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  &--offline {
+    opacity: 0.4;
+    &:hover {
+      opacity: 1;
+    }
+  }
   &__avatar {
     position: relative;
     width: 32px;
