@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Message } from '../types/message';
+import { Reply, Copy, Check, Trash2 } from 'lucide-react';
 
 interface Props {
     message: Message;
@@ -45,32 +46,32 @@ export default function MessageItem({ message, isOwn, isGrouped, onDelete }: Pro
                             {message.user}
                         </span>
                         <span className="message__time ms-2">
-                            {new Date(message.time).toLocaleString('vi-VN', {hour: '2-digit', minute: '2-digit'})}
+                            {new Date(message.time).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                     </div>
-                    )
-                }
+                )}
                 <div className="message__text">{message.text}</div>
             </div>
 
             <div className="message__toolbar">
-                <button className="message__action" title="Trả lời">⤷</button>
+                <button className="message__action" title="Trả lời">
+                    <Reply size={16} />
+                </button>
                 <button 
                     className="message__action" 
                     title={copied ? "Đã sao chép!" : "Sao chép"} 
                     onClick={handleCopy}
                 >
-                    {copied ? '✓' : '⎘'}
+                    {copied ? <Check size={16} color="#23a55a" /> : <Copy size={16} />}
                 </button>
                 <button 
                     className="message__action message__action--danger" 
                     title="Xóa" 
                     onClick={handleDelete}
                 >
-                    ✕
+                    <Trash2 size={16} />
                 </button>
             </div>
-
         </div>
     );
 }

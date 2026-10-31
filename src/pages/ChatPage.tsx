@@ -3,6 +3,7 @@ import { WS_URL } from '../services/config';
 import Sidebar from '../components/Sidebar';
 import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
+import { Hash } from 'lucide-react';
 
 export default function ChatPage() {
     const { messages, status, send, deleteMessage } = useWebSocket(WS_URL);
@@ -13,7 +14,10 @@ export default function ChatPage() {
             <Sidebar />
             <main className="chat-main d-flex flex-column flex-grow-1">
                 <header className="chat-main__header d-flex align-items-center gap-2">
-                    <span className="chat-main__title">#chat-chung</span>
+                    <span className="chat-main__title d-flex align-items-center gap-1">
+                        <Hash size={18} className="text-secondary" />
+                        chat-chung
+                    </span>
                     <span className={`chat-main__dot chat-main__dot--${status}`}></span>
                     <span className="chat-main__status">{status}</span>
                 </header>

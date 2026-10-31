@@ -1,6 +1,7 @@
 import type { Message } from '../types/message';
 import { Fragment, useEffect, useRef } from "react";
 import MessageItem from './MessageItem';
+import { Hash } from 'lucide-react';
 
 interface Props {
     messages: Message[];
@@ -16,7 +17,9 @@ export default function MessageList({ messages, username, onDelete }: Props) {
     return (
         <div className="message-list flex-grow-1 overflow-auto">
             <div className="message-list__empty px-3">
-                <div className="message-list__empty-icon">#</div>
+                <div className="message-list__empty-icon">
+                    <Hash size={36} />
+                </div>
                 <h4 className="fw-bold mt-3 mb-1">Chào mừng đến #chat-chung</h4>
                 <p className="text-secondary">Đây là khởi đầu của kênh #chat-chung. Hãy gửi tin nhắn đầu tiên!</p>
             </div>
