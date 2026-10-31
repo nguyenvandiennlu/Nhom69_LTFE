@@ -1,0 +1,73 @@
+$body-bg-dark: #313338;
+$primary: #5865f2;
+$input-box: #1e1f22;
+$danger: #f23f43;
+
+//LoginPage.tsx
+.login {
+  background: $input-box;
+}
+
+.boxLogin {
+  width: 100%;
+  max-width: 480px;
+  padding: 32px;
+  background: $body-bg-dark;
+  border-radius: 8px;
+}
+
+.titleLogin {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.lableLogin {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.starLogin {
+  color: $danger;
+}
+
+.inputLogin {
+  padding: 10px;
+  background: $input-box;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  color: inherit;
+
+  &:focus {
+    background: $input-box;
+    border-color: $primary;
+    box-shadow: none;
+    color: inherit;
+  }
+
+  // sai thông tin
+  &.is-invalid,
+  &.is-invalid:focus {
+    border-color: $danger;
+    background-image: none;
+    padding-right: 10px;
+  }
+}
+
+.invalid-feedback {
+  font-size: 12px;
+  color: $danger;
+}
+
+.bntLogin {
+  padding: 10px;
+  background: $primary;
+  border: none;
+  border-radius: 4px;
+  color: white;
+
+  &:hover,
+  &:focus {
+    background: darken($primary, 6%);
+  }
+}
