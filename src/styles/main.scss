@@ -162,6 +162,7 @@ $dis-input: #383a40;
 
 // MessageList.txs
 .message-list {
+  scrollbar-width: none;
   &__divider {
     display: flex;
     align-items: center;
