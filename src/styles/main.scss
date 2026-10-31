@@ -230,6 +230,12 @@ $dis-input: #383a40;
       color: #949ba4;
     }
   }
+  &__empty {
+    padding: 24px 8px;
+    text-align: center;
+    font-size: 14px;
+    color: #949ba4;
+  }
 }
 
 // MemberItem.tsx

@@ -24,19 +24,25 @@ export default function MemberList() {
                     <Search size={16} />
                 </div>
             </div>
+            {onlineMembers.length > 0 && (
             <div className="member-list__group-title">
                 Trực tuyến — {onlineMembers.length}
             </div>
+            )}
             {onlineMembers.map((m) => (
                 <MemberItem key={m.id} member={m} />
             ))}
-
+            {onlineMembers.length > 0 && (
             <div className="member-list__group-title">
                 Ngoại tuyến — {offlineMembers.length}
             </div>
+            )}
             {offlineMembers.map((m) => (
                 <MemberItem key={m.id} member={m} />
             ))}
+            {foundMembers.length === 0 && (
+                <div className="member-list__empty">Không tìm thấy thành viên</div>
+            )}
         </aside>
     );
 }
