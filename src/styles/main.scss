@@ -212,6 +212,7 @@ $dis-input: #383a40;
 // MemberItem.tsx
 .member {
   &__avatar {
+    position: relative;
     width: 32px;
     height: 32px;
     flex-shrink: 0;
@@ -221,16 +222,48 @@ $dis-input: #383a40;
     display: flex;
     align-items: center;
     justify-content: center;
-
     &--0 { background: #5865f2; }
     &--1 { background: #3ba55d; }
     &--2 { background: #eb459e; }
     &--3 { background: #e67e22; }
     &--4 { background: #ed4245; }
   }
-
   &__name {
     font-weight: 500;
     color: #dbdee1;
+  }
+  &__dot {
+    position: absolute;
+    right: -3px;
+    bottom: -3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 3px solid $dis-sidebar;
+    &--online {
+      background: #23a55a;
+    }
+    &--idle {
+      background: #f0b232;
+    }
+    &--offline {
+      background: #80848e;
+    }
+  }
+  &__info {
+    min-width: 0;
+  }
+  &__badge {
+    background: $primary;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 0 4px;
+    border-radius: 4px;
+  }
+  &__status {
+    font-size: 12px;
+    line-height: 1.2;
+    color: #949ba4;
   }
 }
