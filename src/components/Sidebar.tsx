@@ -1,43 +1,35 @@
 import { useState } from "react";
-import { Hash, Users } from 'lucide-react';
+import '../styles/sidebar.scss';
 
 //data tạm thời nha
-const rooms = ['Chung', 'Gaming'];
+const rooms = ['chat-chung', 'Gaming', 'dead-line'];
 const onlineUsers = ['PIGGY', 'Điền', 'Duy', 'Dĩ'];
 
 export default function Sidebar() {
     const [currentRoom, setCurrentRoom] = useState(rooms[0]);
-
+    const [isOpen, setIsOpen] = useState(true);
     return (
-        <aside style={{ width: 220 }}>
-            <h3>Phòng</h3>
-            <ul>
-                {rooms.map(room => (
-                    <li 
-                        key={room} 
-                        onClick={() => setCurrentRoom(room)}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            cursor: 'pointer',
-                            fontWeight: room === currentRoom ? 'bold' : 'normal'
-                        }}
-                    >
-                        <Hash size={16} />
-                        {room}
-                    </li>
-                ))}
-            </ul>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Users size={18} />
-                Online ({onlineUsers.length})
-            </h3>
-            <ul>
-                {onlineUsers.map((user) => (
-                    <li key={user}>{user}</li>
-                ))}
-            </ul>
+        <aside className="sidebar">
+            <div className="titleSidebar" onClick={() => setIsOpen(!isOpen)}>
+                <span>{isOpen ? 'v' : '>'} Phòng</span>
+                <span className="addRoom">+</span>
+            </div>
+            {isOpen && rooms.map(room => (
+                <div
+                    key={room}
+                    className={room === currentRoom ? 'room roomActive' : 'room'}
+                    onClick={() => setCurrentRoom(room)}
+                >
+                    # {room}
+                </div>
+            ))}
+            <div className="titleSidebar">Online - {onlineUsers.length}</div>
+            {onlineUsers.map(user => (
+                <div key={user} className="user">
+                    <span className="dotSidebar"></span>
+                    {user}
+                </div>
+            ))}
         </aside>
     );
 }
