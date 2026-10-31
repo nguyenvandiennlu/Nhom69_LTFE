@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar';
 import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
 import { Hash } from 'lucide-react';
+import MemberList from '../components/MemberList';
 
 export default function ChatPage() {
     const { messages, status, send, deleteMessage } = useWebSocket(WS_URL);
@@ -30,6 +31,7 @@ export default function ChatPage() {
                 {/*<ChatInput onSend={(text) => send(username, text)} />*/}
                 <ChatInput onSend={(text) => send(['An', 'Bình', 'Chi', 'An'][Math.floor(Math.random() * 4)], text)} />
             </main>
+            <MemberList />
         </div>
     );
 }

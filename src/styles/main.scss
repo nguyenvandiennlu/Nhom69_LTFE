@@ -193,3 +193,18 @@ $dis-input: #383a40;
     justify-content: center;
   }
 }
+
+// MemberList.tsx
+.member-list {
+  width: 240px;
+  flex-shrink: 0;
+  background: $dis-sidebar;
+  border-left: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 16px 8px;
+  &__group-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #949ba4;
+    padding: 16px 8px 4px;
+  }
+}
