@@ -33,5 +33,9 @@ export function useWebSocket(url: string) {
         }
     }, []);
 
-    return { messages, status, send };
+    const deleteMessage = useCallback((id: string) => {
+        setMessages((prev) => prev.filter((m) => m.id !== id));
+    }, []);
+
+    return { messages, status, send, deleteMessage };
 }
