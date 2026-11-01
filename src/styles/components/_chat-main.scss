@@ -1,0 +1,33 @@
+@use '../base/colors' as *;
+
+// ChatPage.tsx
+.chat-main {
+  background: $body-bg-dark;
+  &__header {
+    padding: 12px 16px;
+    font-weight: 600;
+    border-bottom: 3px solid $border-dark;
+  }
+  &__title {
+    font-weight: 600;
+  }
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    &--connecting {
+      background: $status-idle;
+    }
+    &--open {
+      background: $status-online;
+    }
+    &--closed {
+      background: $danger;
+    }
+  }
+  &__status {
+    font-size: 12px;
+    font-weight: 400;
+    color: $text-muted;
+  }
+}
