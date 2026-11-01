@@ -1,6 +1,6 @@
 import { mockMembers } from '../types/TempMember';
 import MemberItem from './MemberItem';
-import { Search } from 'lucide-react';
+import { Search,X } from 'lucide-react';
 import {useState} from 'react';
 
 export default function MemberList() {
@@ -21,7 +21,13 @@ export default function MemberList() {
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
                     />
-                    <Search size={16} />
+                    {keyword ? (
+                        <button className="member-list__clear" onClick={() => setKeyword('')} title="Xóa">
+                            <X size={16} />
+                        </button>
+                    ) : (
+                        <Search size={16} />
+                    )}
                 </div>
             </div>
             {onlineMembers.length > 0 && (

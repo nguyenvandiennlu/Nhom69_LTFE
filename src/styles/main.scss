@@ -236,6 +236,18 @@ $dis-input: #383a40;
     font-size: 14px;
     color: #949ba4;
   }
+  &__clear {
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    color: inherit;
+    cursor: pointer;
+
+    &:hover {
+      color: #fff;
+    }
+  }
 }
 
 // MemberItem.tsx
