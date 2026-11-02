@@ -1,17 +1,48 @@
-import { useWebSocket } from '../hooks/useWebSocket';
-import { WS_URL } from '../services/config';
+import { useWS } from '../contexts/WebSocketContext';
+import { useEffect, useState } from 'react';
+import ServerRail from '../components/ServerRail';
 import Sidebar from '../components/Sidebar';
 import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
-import { Hash } from 'lucide-react';
 import MemberList from '../components/MemberList';
+import { Hash } from 'lucide-react';
+import type { Message } from '../types/message';
 
 export default function ChatPage() {
-    const { messages, status, send, deleteMessage } = useWebSocket(WS_URL);
+    const { status, sendEvent, lastMessage } = useWS();
+    const [messages, setMessages] = useState<Message[]>([]);
     const username = 'PIGGY';
 
+    useEffect(() => {
+        if (!lastMessage) return;
+
+        if (lastMessage.event === 'SEND_CHAT' && lastMessage.status === 'success') {
+            const data = lastMessage.data;
+            const newMsg: Message = {
+                id: String(data.id ?? crypto.randomUUID()),
+                user: data.name,
+                text: data.mes,
+                time: data.createAt ?? new Date().toISOString(),
+            };
+            setMessages((prev) => [...prev, newMsg]);
+        }
+    }, [lastMessage]);
+
+    const handleSend = (text: string) => {
+        sendEvent('SEND_CHAT', {
+            type: 'room',
+            to: 'chat-chung',
+            mes: text,
+        });
+    };
+
+    const handleDelete = (id: string) => {
+        setMessages((prev) => prev.filter((m) => m.id !== id));
+    };
+
     return (
-        <div className="d-flex vh-100">
+        <div className="d-flex vh-100 overflow-hidden">
+            <ServerRail />
             <Sidebar />
             <main className="chat-main d-flex flex-column flex-grow-1">
                 <header className="chat-main__header d-flex align-items-center gap-2">
@@ -26,10 +57,9 @@ export default function ChatPage() {
                 <MessageList 
                     messages={messages} 
                     username={username} 
-                    onDelete={deleteMessage} 
+                    onDelete={handleDelete} 
                 />
-                {/*<ChatInput onSend={(text) => send(username, text)} />*/}
-                <ChatInput onSend={(text) => send(['An', 'Bình', 'Chi', 'An'][Math.floor(Math.random() * 4)], text)} />
+                <ChatInput onSend={handleSend} />
             </main>
             <MemberList />
         </div>

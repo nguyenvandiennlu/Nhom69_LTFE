@@ -1,0 +1,102 @@
+$dis-rail: #1e1f22;
+$dis-primary: #5865f2;
+$dis-green: #23a55a;
+
+.server-rail {
+  width: 72px;
+  height: 100vh;
+  background-color: $dis-rail;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0;
+  gap: 8px;
+  flex-shrink: 0;
+  user-select: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+
+  &__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+  }
+
+  // Vạch trắng báo hiệu ở mép trái (Pill indicator)
+  &__pill {
+    position: absolute;
+    left: 0;
+    width: 4px;
+    height: 0;
+    background-color: #fff;
+    border-radius: 0 4px 4px 0;
+    transition: height 0.2s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  // Nút server hình tròn biến thành viên thuốc khi hover
+  &__btn {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #313338;
+    color: #dbdee1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: border-radius 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+      border-radius: 16px;
+      background-color: $dis-primary;
+      color: #fff;
+    }
+
+    &--active {
+      border-radius: 16px;
+      background-color: $dis-primary;
+      color: #fff;
+    }
+
+    // Nút thêm server có màu hover xanh lá đặc trưng
+    &--action {
+      background-color: #313338;
+      color: $dis-green;
+
+      &:hover {
+        background-color: $dis-green;
+        color: #fff;
+      }
+    }
+  }
+
+  // Khi hover vào item thì kéo dài vạch trắng
+  &__item:hover &__pill {
+    height: 20px;
+  }
+
+  // Khi đang active thì vạch trắng kéo dài 40px
+  &__item--active &__pill {
+    height: 40px;
+  }
+
+  // Đường gạch ngang phân cách
+  &__divider {
+    width: 32px;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 1px;
+    margin: 2px 0;
+  }
+}
