@@ -1,5 +1,6 @@
 import { useWS } from '../contexts/WebSocketContext';
 import { useEffect, useState } from 'react';
+import ServerRail from '../components/ServerRail';
 import Sidebar from '../components/Sidebar';
 import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
@@ -40,7 +41,8 @@ export default function ChatPage() {
     };
 
     return (
-        <div className="d-flex vh-100">
+        <div className="d-flex vh-100 overflow-hidden">
+            <ServerRail />
             <Sidebar />
             <main className="chat-main d-flex flex-column flex-grow-1">
                 <header className="chat-main__header d-flex align-items-center gap-2">

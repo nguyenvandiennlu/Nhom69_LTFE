@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sass": "sass src/styles:src/styles --load-path=node_modules --source-map",
+    "sass:watch": "sass --watch src/styles:src/styles --load-path=node_modules --source-map"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
