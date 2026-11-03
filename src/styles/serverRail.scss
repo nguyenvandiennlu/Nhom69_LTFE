@@ -29,7 +29,6 @@ $dis-green: #23a55a;
     width: 72px;
   }
 
-  // Vạch trắng báo hiệu ở mép trái (Pill indicator)
   &__pill {
     position: absolute;
     left: 0;
@@ -40,7 +39,6 @@ $dis-green: #23a55a;
     transition: height 0.2s cubic-bezier(0.2, 0, 0, 1);
   }
 
-  // Nút server hình tròn biến thành viên thuốc khi hover
   &__btn {
     position: relative;
     width: 48px;
@@ -69,7 +67,6 @@ $dis-green: #23a55a;
       color: #fff;
     }
 
-    // Nút thêm server có màu hover xanh lá đặc trưng
     &--action {
       background-color: #313338;
       color: $dis-green;
@@ -81,17 +78,14 @@ $dis-green: #23a55a;
     }
   }
 
-  // Khi hover vào item thì kéo dài vạch trắng
   &__item:hover &__pill {
     height: 20px;
   }
 
-  // Khi đang active thì vạch trắng kéo dài 40px
   &__item--active &__pill {
     height: 40px;
   }
 
-  // Đường gạch ngang phân cách
   &__divider {
     width: 32px;
     height: 2px;
