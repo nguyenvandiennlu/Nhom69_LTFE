@@ -4,3 +4,7 @@ export interface Message {
     text: string;
     time: string;
 }
+export interface CurrentChat {
+    name: string;
+    type: 'room' | 'people';
+}

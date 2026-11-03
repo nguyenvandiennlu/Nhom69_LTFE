@@ -6,14 +6,18 @@ import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
 import MemberList from '../components/MemberList';
 import { Hash } from 'lucide-react';
-import type { Message } from '../types/message';
+import type { Message, CurrentChat } from '../types/message';
 
 export default function ChatPage() {
     const { status, sendEvent, lastMessage } = useWS();
     const [messages, setMessages] = useState<Message[]>([]);
-    const username = 'PIGGY';
+    // Tạmmm
+    const username = 'Rời shaco ấy';
+    const currentChat: CurrentChat = { name: 'test2222', type: 'people' };
+    // Tạmmm
 
     useEffect(() => {
+        console.log('WS nhận:', lastMessage);
         if (!lastMessage) return;
 
         if (lastMessage.event === 'SEND_CHAT' && lastMessage.status === 'success') {
@@ -30,10 +34,14 @@ export default function ChatPage() {
 
     const handleSend = (text: string) => {
         sendEvent('SEND_CHAT', {
-            type: 'room',
-            to: 'chat-chung',
+            type: currentChat.type,
+            to: currentChat.name,
             mes: text,
         });
+        setMessages((prev) => [
+            ...prev,
+            { id: crypto.randomUUID(), user: username, text, time: new Date().toISOString() },
+        ]);
     };
 
     const handleDelete = (id: string) => {
