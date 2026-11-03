@@ -1,0 +1,29 @@
+// Nền
+$body-bg-dark: #313338;
+$body-color-dark: #dbdee1;
+$primary: #5865f2;
+$dis-rail: #1e1f22;
+$dis-sidebar: #2b2d31;
+$dis-input: #383a40;
+@import 'bootstrap/scss/bootstrap';
+
+// Màu chữ
+$text-normal: #dbdee1;
+$text-muted: #949ba4;
+$text-soft: #b5bac1;
+$text-own-name: #a5aaf9;
+
+// Màu trạng thái
+$status-online: #23a55a;
+$status-idle: #f0b232;
+$status-offline: #80848e;
+$danger: #f23f43;
+
+// Màu avatar
+$avatar-0: #5865f2;
+$avatar-1: #3ba55d;
+$avatar-2: #eb459e;
+$avatar-3: #e67e22;
+$avatar-4: #ed4245;
+
+$border-dark: rgba(0, 0, 0, 0.3);

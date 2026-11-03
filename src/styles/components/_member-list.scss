@@ -1,0 +1,55 @@
+@use '../base/colors' as *;
+
+// MemberList.tsx
+.member-list {
+  width: 240px;
+  flex-shrink: 0;
+  background: $dis-sidebar;
+  border-left: 1px solid $border-dark;
+  padding: 16px 8px;
+  &__group-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: $text-muted;
+    padding: 16px 8px 4px;
+  }
+  &__search {
+    margin: -16px -8px 0;
+    padding: 12px 8px;
+    border-bottom: 1px solid $border-dark;
+  }
+  &__search-box {
+    background: $dis-rail;
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: $text-muted;
+  }
+  &__search-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: $text-normal;
+    font-size: 14px;
+    min-width: 0;
+    &::placeholder {
+      color: $text-muted;
+    }
+  }
+  &__empty {
+    padding: 24px 8px;
+    text-align: center;
+    font-size: 14px;
+    color: $text-muted;
+  }
+  &__clear {
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    color: inherit;
+    cursor: pointer;
+    &:hover {
+      color: #fff;
+    }
+  }
+}
