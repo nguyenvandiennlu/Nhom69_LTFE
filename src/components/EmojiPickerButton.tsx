@@ -10,7 +10,6 @@ export default function EmojiPickerButton({ onSelectEmoji }: Props) {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    // Tự động đóng popup khi bấm ra bên ngoài
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(e.target as Node)) {

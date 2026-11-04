@@ -3,7 +3,6 @@ $primary: #5865f2;
 $input-box: #1e1f22;
 $danger: #f23f43;
 
-//LoginPage.tsx
 .login {
   background: $input-box;
 }
@@ -45,7 +44,6 @@ $danger: #f23f43;
     color: inherit;
   }
 
-  // sai thông tin
   &.is-invalid,
   &.is-invalid:focus {
     border-color: $danger;
