@@ -18,7 +18,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const ws = new WebSocket(WS_URL);
         wsRef.current = ws;
-        ws.onopen = () => setStatus('open');
+        ws.onopen = () => {
+            setStatus('open');
+            // tạm
+            ws.send(JSON.stringify({ action: 'onchat', data: { event: 'LOGIN', data: { user: 'test1111', pass: 'testtest' } } }));
+        }
         ws.onclose = () => setStatus('closed');
         ws.onerror = () => setStatus('closed');
         ws.onmessage = (e: MessageEvent) => {
@@ -34,6 +38,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const sendEvent = useCallback((event: string, data?: object) => {
+        console.log('GỬI:', event, data, wsRef.current?.readyState);
         if (wsRef.current?.readyState === WebSocket.OPEN) {
             const payload = {
                 action: 'onchat',
