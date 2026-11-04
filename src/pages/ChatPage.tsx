@@ -10,11 +10,13 @@ import type { Message, CurrentChat } from '../types/message';
 
 export default function ChatPage() {
     const { status, sendEvent, lastMessage } = useWS();
-    const [messages, setMessages] = useState<Message[]>([]);
     // Tạmmm
     const username = 'Rời shaco ấy';
     const [currentChat, setCurrentChat] = useState<CurrentChat>({ name: 'test2222', type: 'people' });
     // Tạmmm
+    const [messagesByChat, setMessagesByChat] = useState<Record<string, Message[]>>({});
+    const currentKey = `${currentChat.type}:${currentChat.name}`;
+    const messages = messagesByChat[currentKey] ?? [];
 
     useEffect(() => {
         console.log('WS nhận:', lastMessage);
@@ -28,7 +30,18 @@ export default function ChatPage() {
                 text: data.mes,
                 time: data.createAt ?? new Date().toISOString(),
             };
-            setMessages((prev) => [...prev, newMsg]);
+            const key = `people:${data.name}`;
+            setMessagesByChat((prev) => {
+                let currentList = prev[key];
+                if (!currentList) {
+                    currentList = [];
+                }
+                const updatedList = [...currentList, newMsg];
+                return {
+                    ...prev,
+                    [key]: updatedList,
+                };
+            });
         }
     }, [lastMessage]);
 
@@ -38,14 +51,22 @@ export default function ChatPage() {
             to: currentChat.name,
             mes: text,
         });
-        setMessages((prev) => [
-            ...prev,
-            { id: crypto.randomUUID(), user: username, text, time: new Date().toISOString() },
-        ]);
+        const newMsg: Message = { id: crypto.randomUUID(), user: username, text, time: new Date().toISOString() };
+        setMessagesByChat((prev) => {
+            const oldMessages = prev[currentKey] ? prev[currentKey] : [];
+            const newMessages = [...oldMessages, newMsg];
+            return {
+                ...prev,
+                [currentKey]: newMessages,
+            };
+        });
     };
 
     const handleDelete = (id: string) => {
-        setMessages((prev) => prev.filter((m) => m.id !== id));
+        setMessagesByChat((prev) => ({
+            ...prev,
+            [currentKey]: (prev[currentKey] ?? []).filter((m) => m.id !== id),
+        }));
     };
 
     return (

@@ -19,17 +19,19 @@ export default function MessageList({ messages, username, currentChat, onDelete 
     }, [messages]);
     return (
         <div className="message-list flex-grow-1 overflow-auto">
-            <div className="message-list__empty px-3">
-                <div className="message-list__empty-icon">
-                    {isRoom ? <Hash size={36} /> : <AtSign size={36} />}
+            {messages.length === 0 && (
+                <div className="message-list__empty px-3">
+                    <div className="message-list__empty-icon">
+                        {isRoom ? <Hash size={36} /> : <AtSign size={36} />}
+                    </div>
+                    <h4 className="fw-bold mt-3 mb-1">
+                        {isRoom ? `Chào mừng đến ${prefix}${currentChat.name}` : `${prefix}${currentChat.name}`}
+                    </h4>
+                    <p className="text-secondary">
+                        {isRoom ? 'Đây là khởi đầu của kênh' : 'Đây là khởi đầu cuộc trò chuyện của bạn với'} {prefix}{currentChat.name}. Hãy gửi tin nhắn đầu tiên!
+                    </p>
                 </div>
-                <h4 className="fw-bold mt-3 mb-1">
-                    {isRoom ? `Chào mừng đến ${prefix}${currentChat.name}` : `${prefix}${currentChat.name}`}
-                </h4>
-                <p className="text-secondary">
-                    {isRoom ? 'Đây là khởi đầu của kênh' : 'Đây là khởi đầu cuộc trò chuyện của bạn với'} {prefix}{currentChat.name}. Hãy gửi tin nhắn đầu tiên!
-                </p>
-            </div>
+            )}
             {messages.map((m, i) => {
                 const day = new Date(m.time).toLocaleDateString("vi-VN", {
                     day: 'numeric',
