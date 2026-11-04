@@ -71,6 +71,16 @@ $dis-user-bar: #232428;
   padding: 6px 8px;
   color: #dbdee1;
   font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+.userActive,
+.userActive:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 .dotSidebar {

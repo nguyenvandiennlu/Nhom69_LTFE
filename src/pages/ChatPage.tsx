@@ -13,7 +13,7 @@ export default function ChatPage() {
     const [messages, setMessages] = useState<Message[]>([]);
     // Tạmmm
     const username = 'Rời shaco ấy';
-    const [currentChat] = useState<CurrentChat>({ name: 'test2222', type: 'people' });
+    const [currentChat, setCurrentChat] = useState<CurrentChat>({ name: 'test2222', type: 'people' });
     // Tạmmm
 
     useEffect(() => {
@@ -51,7 +51,7 @@ export default function ChatPage() {
     return (
         <div className="d-flex vh-100 overflow-hidden">
             <ServerRail />
-            <Sidebar />
+            <Sidebar currentChat={currentChat} onSelectChat={setCurrentChat}/>
             <main className="chat-main d-flex flex-column flex-grow-1">
                 <header className="chat-main__header d-flex align-items-center gap-2">
                     <span className="chat-main__title d-flex align-items-center gap-1">
