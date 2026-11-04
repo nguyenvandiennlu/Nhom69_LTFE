@@ -11,10 +11,11 @@ import type { Message, CurrentChat } from '../types/message';
 export default function ChatPage() {
     const { status, sendEvent, lastMessage } = useWS();
     // Tạmmm
-    const username = 'Rời shaco ấy';
+    const username = 'test1111';
     const [currentChat, setCurrentChat] = useState<CurrentChat>({ name: 'test2222', type: 'people' });
     // Tạmmm
     const [messagesByChat, setMessagesByChat] = useState<Record<string, Message[]>>({});
+    const [chatList, setChatList] = useState<CurrentChat[]>([]);
     const currentKey = `${currentChat.type}:${currentChat.name}`;
     const messages = messagesByChat[currentKey] ?? [];
 
@@ -30,7 +31,7 @@ export default function ChatPage() {
                 text: data.mes,
                 time: data.createAt ?? new Date().toISOString(),
             };
-            const key = `people:${data.name}`;
+            const key =  data.type === 0 ? `people:${data.name}` : `room:${data.to}`;
             setMessagesByChat((prev) => {
                 let currentList = prev[key];
                 if (!currentList) {
@@ -43,7 +44,17 @@ export default function ChatPage() {
                 };
             });
         }
-    }, [lastMessage]);
+        if ((lastMessage.event === 'LOGIN' || lastMessage.event === 'RE_LOGIN') && lastMessage.status === 'success') {
+            sendEvent('GET_USER_LIST');
+        }
+        if (lastMessage.event === 'GET_USER_LIST' && lastMessage.status === 'success') {
+            const list: CurrentChat[] = lastMessage.data.map((item: { name: string; type: number }) => ({
+                name: item.name,
+                type: item.type === 1 ? 'room' : 'people',
+            }));
+            setChatList(list);
+        }
+    }, [lastMessage, sendEvent]);
 
     const handleSend = (text: string) => {
         sendEvent('SEND_CHAT', {
@@ -72,7 +83,7 @@ export default function ChatPage() {
     return (
         <div className="d-flex vh-100 overflow-hidden">
             <ServerRail />
-            <Sidebar currentChat={currentChat} onSelectChat={setCurrentChat}/>
+            <Sidebar currentChat={currentChat} chats={chatList} onSelectChat={setCurrentChat}/>
             <main className="chat-main d-flex flex-column flex-grow-1">
                 <header className="chat-main__header d-flex align-items-center gap-2">
                     <span className="chat-main__title d-flex align-items-center gap-1">
