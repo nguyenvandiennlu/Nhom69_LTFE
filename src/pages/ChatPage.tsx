@@ -5,7 +5,7 @@ import Sidebar from '../components/Sidebar';
 import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
 import MemberList from '../components/MemberList';
-import { Hash } from 'lucide-react';
+import { Hash, AtSign } from 'lucide-react';
 import type { Message, CurrentChat } from '../types/message';
 
 export default function ChatPage() {
@@ -13,7 +13,7 @@ export default function ChatPage() {
     const [messages, setMessages] = useState<Message[]>([]);
     // Tạmmm
     const username = 'Rời shaco ấy';
-    const currentChat: CurrentChat = { name: 'test2222', type: 'people' };
+    const [currentChat] = useState<CurrentChat>({ name: 'test2222', type: 'people' });
     // Tạmmm
 
     useEffect(() => {
@@ -55,8 +55,11 @@ export default function ChatPage() {
             <main className="chat-main d-flex flex-column flex-grow-1">
                 <header className="chat-main__header d-flex align-items-center gap-2">
                     <span className="chat-main__title d-flex align-items-center gap-1">
-                        <Hash size={18} className="text-secondary" />
-                        chat-chung
+                        {currentChat.type === 'room' ?
+                            <Hash size={18} className="text-secondary" />
+                            : <AtSign size={18} className="text-secondary" />
+                        }
+                        {currentChat.name}
                     </span>
                     <span className={`chat-main__dot chat-main__dot--${status}`}></span>
                     <span className="chat-main__status">{status}</span>
@@ -64,10 +67,11 @@ export default function ChatPage() {
 
                 <MessageList 
                     messages={messages} 
-                    username={username} 
+                    username={username}
+                    currentChat={currentChat}
                     onDelete={handleDelete} 
                 />
-                <ChatInput onSend={handleSend} />
+                <ChatInput onSend={handleSend} currentChat={currentChat} />
             </main>
             <MemberList />
         </div>

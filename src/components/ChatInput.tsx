@@ -1,12 +1,14 @@
 import { useState, useRef } from 'react';
 import { PlusCircle, Send } from 'lucide-react';
 import EmojiPickerButton from './EmojiPickerButton';
+import type { CurrentChat } from '../types/message';
 
 interface Props {
     onSend: (text: string) => void;
+    currentChat: CurrentChat;
 }
 
-export default function ChatInput({ onSend }: Props) {
+export default function ChatInput({ onSend, currentChat }: Props) {
     const [text, setText] = useState('');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -39,7 +41,7 @@ export default function ChatInput({ onSend }: Props) {
                             handleSend();
                         }
                     }}
-                    placeholder="Nhắn #chat-chung"
+                    placeholder={`Nhắn ${currentChat.type === 'room' ? '#' : '@'}${currentChat.name}`}
                 />
                 <button type="button" className="chat-input__icon chat-input__icon--gif" title="GIF">GIF</button>
                 <EmojiPickerButton onSelectEmoji={handleSelectEmoji} />
