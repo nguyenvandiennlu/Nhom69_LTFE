@@ -20,17 +20,24 @@ const initialChats: CurrentChat[] = [
 
 export default function ChatPage() {
     const { status, sendEvent, lastMessage } = useWS();
-    const [messages, setMessages] = useState<Message[]>([]);
+    // const [messages, setMessages] = useState<Message[]>([]);
+    const [messagesByChat, setMessagesByChat] = useState<Record<string, Message[]>>({});
     const [currentChat, setCurrentChat] = useState<CurrentChat>({ name: 'chat-chung', type: 'room' });
     const [chats] = useState<CurrentChat[]>(initialChats);
     const username = localStorage.getItem('currentUser') || 'PIGGY';
+    const currentKey = `${currentChat.type}:${currentChat.name}`;
+    const messages = messagesByChat[currentKey] ?? [];
 
     useEffect(() => {
         if (!lastMessage) return;
 
         if (lastMessage.event === 'SEND_CHAT' && lastMessage.status === 'success') {
             const newMsg = normalizeMessage(lastMessage.data);
-            setMessages((prev) => [...prev, newMsg]);
+            const key = newMsg.type === 0
+                ? `people:${newMsg.user}` : `room:${newMsg.to}`;
+            setMessagesByChat((prev) => ({
+                ...prev,
+                [key]: [...(prev[key] ?? []), newMsg],}));
         }
     }, [lastMessage]);
 
@@ -40,10 +47,27 @@ export default function ChatPage() {
             to: currentChat.name,
             mes: text,
         });
+        if (currentChat.type === 'people') {
+            const myMsg: Message = {
+                id: crypto.randomUUID(),
+                user: username,
+                text: text,
+                time: new Date().toISOString(),
+                to: currentChat.name,
+                type: 0,
+            };
+            setMessagesByChat((prev) => ({
+                ...prev,
+                [currentKey]: [...(prev[currentKey] ?? []), myMsg],
+            }));
+        }
     };
 
     const handleDelete = (id: string) => {
-        setMessages((prev) => prev.filter((m) => m.id !== id));
+        setMessagesByChat((prev) => ({
+            ...prev,
+            [currentKey]: (prev[currentKey] ?? []).filter((m) => m.id !== id),
+        }));
     };
 
     return (

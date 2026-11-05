@@ -25,6 +25,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     const reconnectTimeoutRef = useRef<number | null>(null);
     const isUnmountedRef = useRef(false);
 
+
     useEffect(() => {
         isUnmountedRef.current = false;
 
@@ -37,6 +38,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
             ws.onopen = () => {
                 setStatus('open');
+                ws.send(JSON.stringify({ action: 'onchat', data: { event: 'LOGIN', data: { user: 'test1111', pass: 'testtest' } } }));
                 if (reconnectTimeoutRef.current) {
                     clearTimeout(reconnectTimeoutRef.current);
                     reconnectTimeoutRef.current = null;
