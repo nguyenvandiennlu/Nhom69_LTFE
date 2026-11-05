@@ -32,7 +32,11 @@ export default function MessageItem({ message, isOwn, isGrouped, onDelete }: Pro
     return (
         <div className={isGrouped ? "message d-flex gap-3 px-3 py-0" : "message d-flex gap-3 px-3 py-2"}>
             {isGrouped ?
-                (<div className="message__spacer"></div>)
+                (<div className="message__spacer">
+                        <span className="message__spacer-time">
+                            {new Date(message.time).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                </div>)
                 :
                 (<div className={`message__avatar message__avatar--${colorIndex}`}>
                     {message.user.charAt(0).toUpperCase()}
