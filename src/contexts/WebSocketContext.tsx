@@ -2,10 +2,18 @@ import { createContext, useContext, useEffect, useRef, useState, useCallback } f
 import type { ReactNode } from 'react';
 import { WS_URL } from '../services/config';
 
+export interface ServerMessage {
+    status?: 'success' | 'error' | string;
+    event?: string;
+    data?: unknown;
+    mes?: string;
+    [key: string]: unknown;
+}
+
 interface WSContextType {
     status: 'connecting' | 'open' | 'closed';
     sendEvent: (event: string, data?: object) => void;
-    lastMessage: any;
+    lastMessage: ServerMessage | null;
 }
 
 const WSContext = createContext<WSContextType | null>(null);
@@ -13,32 +21,64 @@ const WSContext = createContext<WSContextType | null>(null);
 export function WebSocketProvider({ children }: { children: ReactNode }) {
     const wsRef = useRef<WebSocket | null>(null);
     const [status, setStatus] = useState<'connecting' | 'open' | 'closed'>('connecting');
-    const [lastMessage, setLastMessage] = useState<any>(null);
+    const [lastMessage, setLastMessage] = useState<ServerMessage | null>(null);
+    const reconnectTimeoutRef = useRef<number | null>(null);
+    const isUnmountedRef = useRef(false);
 
     useEffect(() => {
-        const ws = new WebSocket(WS_URL);
-        wsRef.current = ws;
-        ws.onopen = () => {
-            setStatus('open');
-            // tạm
-            ws.send(JSON.stringify({ action: 'onchat', data: { event: 'LOGIN', data: { user: 'test1111', pass: 'testtest' } } }));
+        isUnmountedRef.current = false;
+
+        function connect() {
+            if (isUnmountedRef.current) return;
+
+            setStatus('connecting');
+            const ws = new WebSocket(WS_URL);
+            wsRef.current = ws;
+
+            ws.onopen = () => {
+                setStatus('open');
+                if (reconnectTimeoutRef.current) {
+                    clearTimeout(reconnectTimeoutRef.current);
+                    reconnectTimeoutRef.current = null;
+                }
+            };
+
+            ws.onmessage = (e: MessageEvent) => {
+                try {
+                    const parsed = JSON.parse(e.data);
+                    setLastMessage(parsed);
+                } catch {
+                    console.error('Không parse được:', e.data);
+                }
+            };
+
+            ws.onerror = () => {
+                ws.close();
+            };
+
+            ws.onclose = () => {
+                if (isUnmountedRef.current) return;
+                setStatus('closed');
+                reconnectTimeoutRef.current = window.setTimeout(() => {
+                    connect();
+                }, 3000);
+            };
         }
-        ws.onclose = () => setStatus('closed');
-        ws.onerror = () => setStatus('closed');
-        ws.onmessage = (e: MessageEvent) => {
-            try {
-                const parsed = JSON.parse(e.data);
-                setLastMessage(parsed);
-            } catch {
-                console.error('Không parse được:', e.data);
+
+        connect();
+
+        return () => {
+            isUnmountedRef.current = true;
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+            }
+            if (wsRef.current) {
+                wsRef.current.close();
             }
         };
-
-        return () => ws.close();
     }, []);
 
     const sendEvent = useCallback((event: string, data?: object) => {
-        console.log('GỬI:', event, data, wsRef.current?.readyState);
         if (wsRef.current?.readyState === WebSocket.OPEN) {
             const payload = {
                 action: 'onchat',
