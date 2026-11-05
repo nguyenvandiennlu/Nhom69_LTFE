@@ -1,5 +1,5 @@
 import { useWS } from '../contexts/WebSocketContext';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import ServerRail from '../components/ServerRail';
 import Sidebar from '../components/Sidebar';
 import MessageList from '../components/MessageList';
@@ -23,10 +23,11 @@ export default function ChatPage() {
     // const [messages, setMessages] = useState<Message[]>([]);
     const [messagesByChat, setMessagesByChat] = useState<Record<string, Message[]>>({});
     const [currentChat, setCurrentChat] = useState<CurrentChat>({ name: 'chat-chung', type: 'room' });
-    const [chats] = useState<CurrentChat[]>(initialChats);
+    const [chats, setChats] = useState<CurrentChat[]>(initialChats);
     const username = localStorage.getItem('currentUser') || 'PIGGY';
     const currentKey = `${currentChat.type}:${currentChat.name}`;
     const messages = messagesByChat[currentKey] ?? [];
+    const historyFor = useRef('');
 
     useEffect(() => {
         if (!lastMessage) return;
@@ -39,7 +40,32 @@ export default function ChatPage() {
                 ...prev,
                 [key]: [...(prev[key] ?? []), newMsg],}));
         }
+        if (lastMessage.event === 'LOGIN' && lastMessage.status === 'success') {
+            sendEvent('GET_USER_LIST');
+        }
+        if (lastMessage.event === 'GET_USER_LIST' && lastMessage.status === 'success') {
+            const list = lastMessage.data as { name: string; type: number }[];
+            const newChats: CurrentChat[] = list.map((item) => ({
+                name: item.name,
+                type: item.type === 1 ? 'room' : 'people',
+            }));
+            setChats(newChats);
+        }
+        if (lastMessage.event === 'GET_PEOPLE_CHAT_MES' && lastMessage.status === 'success') {
+            const list = lastMessage.data as unknown[];
+            const history = list.map((item) => normalizeMessage(item));
+            history.sort((a, b) => (a.time < b.time ? -1 : 1));
+
+            const key = `people:${historyFor.current}`;
+            setMessagesByChat((prev) => ({ ...prev, [key]: history }));
+        }
     }, [lastMessage]);
+
+    useEffect(() => {
+        if (currentChat.type !== 'people') return;
+        historyFor.current = currentChat.name;
+        sendEvent('GET_PEOPLE_CHAT_MES', { name: currentChat.name, page: 1 });
+    }, [currentChat]);
 
     const handleSend = (text: string) => {
         sendEvent('SEND_CHAT', {
