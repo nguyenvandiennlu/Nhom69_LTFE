@@ -38,7 +38,7 @@ export default function MemberList() {
             {onlineMembers.map((m) => (
                 <MemberItem key={m.id} member={m} />
             ))}
-            {onlineMembers.length > 0 && (
+            {offlineMembers.length > 0 && (
             <div className="member-list__group-title">
                 Ngoại tuyến — {offlineMembers.length}
             </div>
