@@ -9,21 +9,12 @@ import { normalizeMessage } from '../services/messageUtils';
 import { Hash, AtSign  } from 'lucide-react';
 import type { Message, CurrentChat } from '../types/message';
 
-const initialChats: CurrentChat[] = [
-    { name: 'chat-chung', type: 'room' },
-    { name: 'Gaming', type: 'room' },
-    { name: 'dead-line', type: 'room' },
-    { name: 'Điền', type: 'people' },
-    { name: 'Duy', type: 'people' },
-    { name: 'Dĩ', type: 'people' },
-];
-
 export default function ChatPage() {
     const { status, sendEvent, lastMessage } = useWS();
     // const [messages, setMessages] = useState<Message[]>([]);
     const [messagesByChat, setMessagesByChat] = useState<Record<string, Message[]>>({});
     const [currentChat, setCurrentChat] = useState<CurrentChat>({ name: 'chat-chung', type: 'room' });
-    const [chats, setChats] = useState<CurrentChat[]>(initialChats);
+    const [chats, setChats] = useState<CurrentChat[]>([]);
     const username = localStorage.getItem('currentUser') || 'PIGGY';
     const currentKey = `${currentChat.type}:${currentChat.name}`;
     const messages = messagesByChat[currentKey] ?? [];
@@ -44,8 +35,9 @@ export default function ChatPage() {
             sendEvent('GET_USER_LIST');
         }
         if (lastMessage.event === 'GET_USER_LIST' && lastMessage.status === 'success') {
-            const list = lastMessage.data as { name: string; type: number }[];
-            const newChats: CurrentChat[] = list.map((item) => ({
+            const list = lastMessage.data as { name: string; type: number ; actionTime: string}[];
+            const sorted = [...list].sort((a, b) => (a.actionTime < b.actionTime ? 1 : -1));
+            const newChats: CurrentChat[] = sorted.map((item) => ({
                 name: item.name,
                 type: item.type === 1 ? 'room' : 'people',
             }));
