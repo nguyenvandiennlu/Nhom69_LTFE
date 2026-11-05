@@ -52,7 +52,7 @@ export default function Sidebar({ currentChat, chats, onSelectChat }: Props) {
                     </div>
                 ))}
 
-                <div className="titleSidebar">Trực tuyến — {people.length}</div>
+                <div className="titleSidebar">Tin nhắn riêng — {people.length}</div>
                 {people.map(person => (
                     <div 
                         key={person.name}

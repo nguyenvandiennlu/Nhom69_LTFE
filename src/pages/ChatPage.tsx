@@ -6,7 +6,7 @@ import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
 import MemberList from '../components/MemberList';
 import { normalizeMessage } from '../services/messageUtils';
-import { Hash, User } from 'lucide-react';
+import { Hash, AtSign  } from 'lucide-react';
 import type { Message, CurrentChat } from '../types/message';
 
 const initialChats: CurrentChat[] = [
@@ -110,7 +110,7 @@ export default function ChatPage() {
                         {currentChat.type === 'room' ? (
                             <Hash size={18} className="text-secondary" />
                         ) : (
-                            <User size={18} className="text-secondary" />
+                            <AtSign size={18} className="text-secondary" />
                         )}
                         {currentChat.name}
                     </span>
