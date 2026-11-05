@@ -1,3 +1,8 @@
+export interface CurrentChat {
+    name: string;
+    type: 'room' | 'people';
+}
+
 export interface Message {
     id: string;
     user: string;
