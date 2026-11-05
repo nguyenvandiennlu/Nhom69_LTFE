@@ -1,4 +1,4 @@
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import '../styles/login.scss';
 import {type FormEvent, useState} from "react";
 
@@ -66,6 +66,9 @@ export default function LoginPage() {
                 </div>
 
                 <button type="submit" className="btn btn-primary bntLogin w-100">Đăng nhập</button>
+                <div className="mt-3 text-center">
+                    Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
+                </div>
             </form>
         </div>
     );
