@@ -2,10 +2,12 @@ import {Link, useNavigate} from "react-router-dom";
 import '../styles/login.scss';
 import {type FormEvent, useEffect, useRef, useState} from "react";
 import {useWS} from "../contexts/WebSocketContext";
+import {useAuth} from "../contexts/AuthContext";
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const {status, sendEvent, lastMessage} = useWS();
+    const {login} = useAuth();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
@@ -17,13 +19,12 @@ export default function LoginPage() {
         sentUser.current = '';
         if (lastMessage.status === 'success') {
             const data = lastMessage.data as {RE_LOGIN_CODE: string};
-            localStorage.setItem('currentUser', user);
-            localStorage.setItem('RE_LOGIN_CODE', data.RE_LOGIN_CODE);
+            login(user, data.RE_LOGIN_CODE);
             navigate('/chat');
         } else {
             setLoginError('Tên đăng nhập hoặc mật khẩu không đúng');
         }
-    }, [lastMessage, navigate]);
+    }, [lastMessage, navigate, login]);
 
     const handleLogin = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
