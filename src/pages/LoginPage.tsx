@@ -1,24 +1,38 @@
 import {Link, useNavigate} from "react-router-dom";
 import '../styles/login.scss';
-import {type FormEvent, useState} from "react";
-
-//acc test
-const TEMP_USER = 'test';
-const TEMP_PASSWORD = 'test';
+import {type FormEvent, useEffect, useRef, useState} from "react";
+import {useWS} from "../contexts/WebSocketContext";
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const {status, sendEvent, lastMessage} = useWS();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
+    const sentUser = useRef('');
+
+    useEffect(() => {
+        if (!sentUser.current || lastMessage?.event !== 'LOGIN') return;
+        const user = sentUser.current;
+        sentUser.current = '';
+        if (lastMessage.status === 'success') {
+            const data = lastMessage.data as {RE_LOGIN_CODE: string};
+            localStorage.setItem('currentUser', user);
+            localStorage.setItem('RE_LOGIN_CODE', data.RE_LOGIN_CODE);
+            navigate('/chat');
+        } else {
+            setLoginError('Tên đăng nhập hoặc mật khẩu không đúng');
+        }
+    }, [lastMessage, navigate]);
 
     const handleLogin = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (userName.trim() !== TEMP_USER || password !== TEMP_PASSWORD) {
-            setLoginError('Tên đăng nhập hoặc mật khẩu không đúng');
+        if (status !== 'open') {
+            setLoginError('Chưa kết nối được tới server');
             return;
         }
-        navigate('/chat');
+        sentUser.current = userName.trim();
+        sendEvent('LOGIN', {user: userName.trim(), pass: password});
     };
     const inputClass = loginError ? 'form-control inputLogin is-invalid' : 'form-control inputLogin';
 
