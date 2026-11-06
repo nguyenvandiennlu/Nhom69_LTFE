@@ -8,6 +8,7 @@ import MemberList from '../components/MemberList';
 import { normalizeMessage } from '../services/messageUtils';
 import { Hash, AtSign  } from 'lucide-react';
 import type { Message, CurrentChat } from '../types/message';
+import FriendsPage from '../components/FriendsPage';
 
 export default function ChatPage() {
     const { status, sendEvent, lastMessage } = useWS();
@@ -19,6 +20,7 @@ export default function ChatPage() {
     const currentKey = `${currentChat.type}:${currentChat.name}`;
     const messages = messagesByChat[currentKey] ?? [];
     const historyFor = useRef('');
+    const [showFriends, setShowFriends] = useState(true);
 
     useEffect(() => {
         if (!lastMessage) return;
@@ -87,17 +89,26 @@ export default function ChatPage() {
             [currentKey]: (prev[currentKey] ?? []).filter((m) => m.id !== id),
         }));
     };
-
+    const handleSelectChat = (chat: CurrentChat) => {
+        setCurrentChat(chat);
+        setShowFriends(false);
+    };
     return (
         <div className="d-flex vh-100 overflow-hidden">
             <ServerRail />
             <Sidebar 
                 currentChat={currentChat} 
                 chats={chats} 
-                onSelectChat={setCurrentChat} 
+                onSelectChat={handleSelectChat}
+                showFriends={showFriends}
+                onShowFriends={() => setShowFriends(true)}
             />
             <main className="chat-main d-flex flex-column flex-grow-1">
-                <header className="chat-main__header d-flex align-items-center gap-2">
+                {showFriends ? (
+                    <FriendsPage />
+                ) : (
+                <>
+                    <header className="chat-main__header d-flex align-items-center gap-2">
                     <span className="chat-main__title d-flex align-items-center gap-1">
                         {currentChat.type === 'room' ? (
                             <Hash size={18} className="text-secondary" />
@@ -108,15 +119,17 @@ export default function ChatPage() {
                     </span>
                     <span className={`chat-main__dot chat-main__dot--${status}`}></span>
                     <span className="chat-main__status">{status}</span>
-                </header>
+                    </header>
 
-                <MessageList 
-                    messages={messages} 
-                    username={username} 
-                    currentChat={currentChat}
-                    onDelete={handleDelete} 
-                />
-                <ChatInput onSend={handleSend} currentChat={currentChat} />
+                    <MessageList
+                        messages={messages}
+                        username={username}
+                        currentChat={currentChat}
+                        onDelete={handleDelete}
+                    />
+                    <ChatInput onSend={handleSend} currentChat={currentChat} />
+                </>)}
+
             </main>
             <MemberList />
         </div>

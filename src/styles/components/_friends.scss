@@ -1,0 +1,23 @@
+@use '../base/colors' as *;
+
+// FriendsPage.tsx
+.friends {
+  background: $body-bg-dark;
+  min-width: 0;
+  &__header {
+    padding: 10px 16px;
+    border-bottom: 3px solid $border-dark;
+  }
+  &__title {
+    font-weight: 600;
+  }
+  &__body {
+    padding: 16px;
+    overflow-y: auto;
+  }
+  &__empty {
+    padding: 32px 0;
+    text-align: center;
+    color: $text-muted;
+  }
+}
