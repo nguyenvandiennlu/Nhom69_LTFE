@@ -38,9 +38,6 @@ export default function ChatPage() {
                 ...prev,
                 [key]: [...(prev[key] ?? []), newMsg],}));
         }
-        if ((lastMessage.event === 'LOGIN' || lastMessage.event === 'RE_LOGIN') && lastMessage.status === 'success') {
-            sendEvent('GET_USER_LIST');
-        }
         if (lastMessage.event === 'GET_USER_LIST' && lastMessage.status === 'success') {
             const list = lastMessage.data as { name: string; type: number ; actionTime: string}[];
             const sorted = [...list].sort((a, b) => (a.actionTime < b.actionTime ? 1 : -1));
@@ -58,7 +55,7 @@ export default function ChatPage() {
             const key = `people:${historyFor.current}`;
             setMessagesByChat((prev) => ({ ...prev, [key]: history }));
         }
-    }, [lastMessage, sendEvent]);
+    }, [lastMessage]);
 
     useEffect(() => {
         if (currentChat.type !== 'people') return;
