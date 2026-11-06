@@ -6,28 +6,21 @@ import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
 import MemberList from '../components/MemberList';
 import { normalizeMessage } from '../services/messageUtils';
-import { Hash, User } from 'lucide-react';
+import { Hash, AtSign  } from 'lucide-react';
 import type { Message, CurrentChat } from '../types/message';
-
-const initialChats: CurrentChat[] = [
-    { name: 'chat-chung', type: 'room' },
-    { name: 'Gaming', type: 'room' },
-    { name: 'dead-line', type: 'room' },
-    { name: 'Điền', type: 'people' },
-    { name: 'Duy', type: 'people' },
-    { name: 'Dĩ', type: 'people' },
-];
+import FriendsPage from '../components/FriendsPage';
 
 export default function ChatPage() {
     const { status, sendEvent, lastMessage } = useWS();
     // const [messages, setMessages] = useState<Message[]>([]);
     const [messagesByChat, setMessagesByChat] = useState<Record<string, Message[]>>({});
     const [currentChat, setCurrentChat] = useState<CurrentChat>({ name: 'chat-chung', type: 'room' });
-    const [chats, setChats] = useState<CurrentChat[]>(initialChats);
+    const [chats, setChats] = useState<CurrentChat[]>([]);
     const username = localStorage.getItem('currentUser') || 'PIGGY';
     const currentKey = `${currentChat.type}:${currentChat.name}`;
     const messages = messagesByChat[currentKey] ?? [];
     const historyFor = useRef('');
+    const [showFriends, setShowFriends] = useState(true);
 
     useEffect(() => {
         if (!lastMessage) return;
@@ -44,8 +37,9 @@ export default function ChatPage() {
             sendEvent('GET_USER_LIST');
         }
         if (lastMessage.event === 'GET_USER_LIST' && lastMessage.status === 'success') {
-            const list = lastMessage.data as { name: string; type: number }[];
-            const newChats: CurrentChat[] = list.map((item) => ({
+            const list = lastMessage.data as { name: string; type: number ; actionTime: string}[];
+            const sorted = [...list].sort((a, b) => (a.actionTime < b.actionTime ? 1 : -1));
+            const newChats: CurrentChat[] = sorted.map((item) => ({
                 name: item.name,
                 type: item.type === 1 ? 'room' : 'people',
             }));
@@ -95,36 +89,47 @@ export default function ChatPage() {
             [currentKey]: (prev[currentKey] ?? []).filter((m) => m.id !== id),
         }));
     };
-
+    const handleSelectChat = (chat: CurrentChat) => {
+        setCurrentChat(chat);
+        setShowFriends(false);
+    };
     return (
         <div className="d-flex vh-100 overflow-hidden">
             <ServerRail />
             <Sidebar 
                 currentChat={currentChat} 
                 chats={chats} 
-                onSelectChat={setCurrentChat} 
+                onSelectChat={handleSelectChat}
+                showFriends={showFriends}
+                onShowFriends={() => setShowFriends(true)}
             />
             <main className="chat-main d-flex flex-column flex-grow-1">
-                <header className="chat-main__header d-flex align-items-center gap-2">
+                {showFriends ? (
+                    <FriendsPage friends={chats.filter((c) => c.type === 'people')} onOpenChat={handleSelectChat}/>
+                ) : (
+                <>
+                    <header className="chat-main__header d-flex align-items-center gap-2">
                     <span className="chat-main__title d-flex align-items-center gap-1">
                         {currentChat.type === 'room' ? (
                             <Hash size={18} className="text-secondary" />
                         ) : (
-                            <User size={18} className="text-secondary" />
+                            <AtSign size={18} className="text-secondary" />
                         )}
                         {currentChat.name}
                     </span>
                     <span className={`chat-main__dot chat-main__dot--${status}`}></span>
                     <span className="chat-main__status">{status}</span>
-                </header>
+                    </header>
 
-                <MessageList 
-                    messages={messages} 
-                    username={username} 
-                    currentChat={currentChat}
-                    onDelete={handleDelete} 
-                />
-                <ChatInput onSend={handleSend} currentChat={currentChat} />
+                    <MessageList
+                        messages={messages}
+                        username={username}
+                        currentChat={currentChat}
+                        onDelete={handleDelete}
+                    />
+                    <ChatInput onSend={handleSend} currentChat={currentChat} />
+                </>)}
+
             </main>
             <MemberList />
         </div>

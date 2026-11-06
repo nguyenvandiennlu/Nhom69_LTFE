@@ -222,3 +222,26 @@ $dis-user-bar: #232428;
     transform: translateX(-50%) translateY(0);
   }
 }
+.titleSidebar--click {
+  cursor: pointer;
+}
+
+.sidebar__friends {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #949ba4;
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #dbdee1;
+  }
+  &--active,
+  &--active:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+}

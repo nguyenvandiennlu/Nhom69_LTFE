@@ -71,4 +71,14 @@
     width: 40px;
     flex-shrink: 0;
   }
+  &__spacer-time {
+    display: none;
+    font-size: 11px;
+    line-height: 22px;
+    text-align: center;
+    color: $text-muted;
+  }
+  &:hover &__spacer-time {
+    display: block;
+  }
 }

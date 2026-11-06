@@ -1,0 +1,66 @@
+@use '../base/colors' as *;
+
+// FriendsPage.tsx
+.friends {
+  background: $body-bg-dark;
+  min-width: 0;
+  &__header {
+    padding: 10px 16px;
+    border-bottom: 3px solid $border-dark;
+  }
+  &__title {
+    font-weight: 600;
+  }
+  &__body {
+    padding: 16px;
+    overflow-y: auto;
+  }
+  &__item {
+    padding: 10px 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    cursor: pointer;
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+  }
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &--0 { background: $avatar-0; }
+    &--1 { background: $avatar-1; }
+    &--2 { background: $avatar-2; }
+    &--3 { background: $avatar-3; }
+    &--4 { background: $avatar-4; }
+  }
+  &__name {
+    font-weight: 600;
+    color: $text-normal;
+  }
+  &__action {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: $dis-sidebar;
+    color: $text-soft;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover {
+      color: #fff;
+    }
+  }
+  &__empty {
+    padding: 32px 0;
+    text-align: center;
+    color: $text-muted;
+  }
+}
