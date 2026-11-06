@@ -114,6 +114,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
         return () => {
             isUnmountedRef.current = true;
+            isReLoggingIn.current = false;
             if (reconnectTimeoutRef.current) {
                 clearTimeout(reconnectTimeoutRef.current);
             }
