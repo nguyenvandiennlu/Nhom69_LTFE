@@ -16,11 +16,12 @@ export default function RegisterPage() {
         if (!isSent.current || lastMessage?.event !== 'REGISTER') return;
         isSent.current = false;
         if (lastMessage.status === 'success') {
+            window.alert('Đăng ký thành công, bấm OK để sang trang Đăng Nhập');
             navigate('/login');
         } else if (lastMessage.mes === 'User already exists!') {
-            setRegisterError('Tên đăng nhập đã tồn tại');
+            window.alert('Đăng ký không thành công: tên đăng nhập đã tồn tại');
         } else {
-            setRegisterError(lastMessage.mes ?? 'Đăng ký không thành công');
+            window.alert(lastMessage.mes ?? 'Đăng ký không thành công');
         }
     }, [lastMessage, navigate]);
 
@@ -34,6 +35,7 @@ export default function RegisterPage() {
             setRegisterError('Mật khẩu xác nhận không khớp');
             return;
         }
+        isSent.current = true;
         sendEvent('REGISTER', {user: userName.trim(), pass: password});
     };
     const inputClass = registerError ? 'form-control inputLogin is-invalid' : 'form-control inputLogin';
