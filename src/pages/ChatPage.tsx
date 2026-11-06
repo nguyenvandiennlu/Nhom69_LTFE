@@ -11,8 +11,7 @@ import type { Message, CurrentChat } from '../types/message';
 import FriendsPage from '../components/FriendsPage';
 
 export default function ChatPage() {
-    const { status, sendEvent, lastMessage } = useWS();
-    // const [messages, setMessages] = useState<Message[]>([]);
+    const { status, sendEvent, lastMessage, isAuthenticated } = useWS();
     const [messagesByChat, setMessagesByChat] = useState<Record<string, Message[]>>({});
     const [currentChat, setCurrentChat] = useState<CurrentChat>({ name: 'chat-chung', type: 'room' });
     const [chats, setChats] = useState<CurrentChat[]>([]);
@@ -21,6 +20,12 @@ export default function ChatPage() {
     const messages = messagesByChat[currentKey] ?? [];
     const historyFor = useRef('');
     const [showFriends, setShowFriends] = useState(true);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            sendEvent('GET_USER_LIST');
+        }
+    }, [isAuthenticated, sendEvent]);
 
     useEffect(() => {
         if (!lastMessage) return;
@@ -32,9 +37,6 @@ export default function ChatPage() {
             setMessagesByChat((prev) => ({
                 ...prev,
                 [key]: [...(prev[key] ?? []), newMsg],}));
-        }
-        if (lastMessage.event === 'LOGIN' && lastMessage.status === 'success') {
-            sendEvent('GET_USER_LIST');
         }
         if (lastMessage.event === 'GET_USER_LIST' && lastMessage.status === 'success') {
             const list = lastMessage.data as { name: string; type: number ; actionTime: string}[];
@@ -59,7 +61,7 @@ export default function ChatPage() {
         if (currentChat.type !== 'people') return;
         historyFor.current = currentChat.name;
         sendEvent('GET_PEOPLE_CHAT_MES', { name: currentChat.name, page: 1 });
-    }, [currentChat]);
+    }, [currentChat, sendEvent]);
 
     const handleSend = (text: string) => {
         sendEvent('SEND_CHAT', {
