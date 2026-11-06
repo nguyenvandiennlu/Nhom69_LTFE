@@ -105,7 +105,7 @@ export default function ChatPage() {
             />
             <main className="chat-main d-flex flex-column flex-grow-1">
                 {showFriends ? (
-                    <FriendsPage />
+                    <FriendsPage friends={chats.filter((c) => c.type === 'people')} onOpenChat={handleSelectChat}/>
                 ) : (
                 <>
                     <header className="chat-main__header d-flex align-items-center gap-2">
