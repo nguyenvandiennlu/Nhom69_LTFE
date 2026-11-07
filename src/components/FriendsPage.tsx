@@ -5,13 +5,22 @@ import { useState } from 'react';
 interface Props {
     friends: CurrentChat[];
     onOpenChat: (chat: CurrentChat) => void;
+    onAddFriend: (name: string) => void;
+    addError: string;
 }
-export default function FriendsPage({ friends, onOpenChat }: Props) {
+export default function FriendsPage({ friends, onOpenChat, onAddFriend, addError }: Props) {
     const [tab, setTab] = useState('all');
     const [keyword, setKeyword] = useState('');
     const found = friends.filter((f) =>
         f.name.toLowerCase().includes(keyword.toLowerCase())
     );
+    const [newName, setNewName] = useState('');
+    const handleAdd = () => {
+        const name = newName.trim();
+        if (name === '') return;
+        onAddFriend(name);
+        setNewName('');
+    };
     const title = tab === 'online' ? 'Trực tuyến' : 'Tất cả bạn bè';
     return (
         <div className="friends d-flex flex-column flex-grow-1">
@@ -41,7 +50,29 @@ export default function FriendsPage({ friends, onOpenChat }: Props) {
             </header>
             <div className="friends__body flex-grow-1">
                 {tab === 'add' && (
-                    <div className="friends__empty">addfen</div>
+                    <div>
+                        <div className="friends__group-title">Thêm bạn</div>
+                        <p className="friends__hint">Nhập tên người dùng để bắt đầu trò chuyện.</p>
+                        <div className="friends__add d-flex align-items-center gap-2">
+                            <input
+                                className="friends__add-input flex-grow-1"
+                                placeholder="Nhập tên người dùng"
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleAdd();
+                                }}
+                            />
+                            <button
+                                className="btn btn-primary btn-sm"
+                                onClick={handleAdd}
+                                disabled={!newName.trim()}
+                            >
+                                Gửi
+                            </button>
+                        </div>
+                        {addError && <div className="friends__error">{addError}</div>}
+                    </div>
                 )}
                 {tab !== 'add' && (
                     <>

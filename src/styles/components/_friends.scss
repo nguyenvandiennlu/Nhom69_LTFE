@@ -110,6 +110,26 @@
       color: #fff;
     }
   }
+  &__hint {
+    color: $text-muted;
+    font-size: 14px;
+  }
+  &__add {
+    background: $dis-rail;
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+  &__add-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: $text-normal;
+  }
+  &__error {
+    margin-top: 8px;
+    font-size: 14px;
+    color: $danger;
+  }
   &__empty {
     padding: 32px 0;
     text-align: center;
