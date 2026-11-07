@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWS } from "../contexts/WebSocketContext";
+import { useAuth } from "../contexts/AuthContext";
 import { Mic, MicOff, Headphones, HeadphoneOff, LogOut } from "lucide-react";
 
 export default function UserProfileBar() {
     const navigate = useNavigate();
     const { sendEvent } = useWS();
+    const { logout } = useAuth();
     const [isMuted, setIsMuted] = useState(false);
     const [isDeafened, setIsDeafened] = useState(false);
 
@@ -28,8 +30,7 @@ export default function UserProfileBar() {
     const handleLogout = () => {
         if (window.confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
             sendEvent('LOGOUT');
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('RE_LOGIN_CODE');
+            logout();
             navigate('/login');
         }
     };
