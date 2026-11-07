@@ -11,6 +11,58 @@
   &__title {
     font-weight: 600;
   }
+  &__tab {
+    background: transparent;
+    border: none;
+    padding: 2px 10px;
+    border-radius: 6px;
+    color: $text-soft;
+    font-weight: 500;
+    cursor: pointer;
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    &--active,
+    &--active:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+    &--add,
+    &--add:hover {
+      background: $primary;
+      color: #fff;
+    }
+  }
+  &__search {
+    background: $dis-rail;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 16px;
+    color: $text-muted;
+  }
+  &__search-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: $text-normal;
+  }
+  &__clear {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: $text-muted;
+    cursor: pointer;
+    &:hover {
+      color: #fff;
+    }
+  }
+  &__group-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: $text-soft;
+    margin-bottom: 8px;
+  }
   &__body {
     padding: 16px;
     overflow-y: auto;

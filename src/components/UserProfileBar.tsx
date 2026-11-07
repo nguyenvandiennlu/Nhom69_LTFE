@@ -9,7 +9,7 @@ export default function UserProfileBar() {
     const [isMuted, setIsMuted] = useState(false);
     const [isDeafened, setIsDeafened] = useState(false);
 
-    const currentUser = localStorage.getItem('currentUser') || 'PIGGY';
+    const currentUser = localStorage.getItem('currentUser') || 'test1111';
 
     const toggleMic = () => {
         setIsMuted(!isMuted);
