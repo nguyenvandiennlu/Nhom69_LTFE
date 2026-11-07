@@ -9,11 +9,11 @@ import './styles/main.scss';
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
-            <WebSocketProvider>
-                <AuthProvider>
+            <AuthProvider>
+                <WebSocketProvider>
                     <App />
-                </AuthProvider>
-            </WebSocketProvider>
+                </WebSocketProvider>
+            </AuthProvider>
         </BrowserRouter>
     </StrictMode>
 );
