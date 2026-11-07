@@ -1,11 +1,13 @@
-import {Link, useNavigate} from "react-router-dom";
+import {Link, Navigate, useNavigate} from "react-router-dom";
 import '../styles/login.scss';
 import {type FormEvent, useEffect, useRef, useState} from "react";
 import {useWS} from "../contexts/WebSocketContext";
+import {useAuth} from "../contexts/AuthContext";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
     const {sendEvent, lastMessage} = useWS();
+    const {username} = useAuth();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -16,7 +18,7 @@ export default function RegisterPage() {
         if (!isSent.current || lastMessage?.event !== 'REGISTER') return;
         isSent.current = false;
         if (lastMessage.status === 'success') {
-            window.alert('Đăng ký thành công, bấm OK để sang trang Đăng Nhập');
+            window.alert('Đăng ký thành công, bấm OK để sang trang đăng nhập');
             navigate('/login');
         } else if (lastMessage.mes === 'User already exists!') {
             window.alert('Đăng ký không thành công: tên đăng nhập đã tồn tại');
@@ -38,6 +40,10 @@ export default function RegisterPage() {
         isSent.current = true;
         sendEvent('REGISTER', {user: userName.trim(), pass: password});
     };
+
+    // đăng nhập rồi thì không vào /register
+    if (username) return <Navigate to="/chat" replace />;
+
     const inputClass = registerError ? 'form-control inputLogin is-invalid' : 'form-control inputLogin';
 
     return (
