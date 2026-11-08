@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { WS_URL } from '../services/config';
 import { useAuth } from './AuthContext';
 
@@ -23,6 +23,10 @@ const WSContext = createContext<WSContextType | null>(null);
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
     const navigate = useNavigate();
+    const location = useLocation();
+    const pathRef = useRef(location.pathname);
+    pathRef.current = location.pathname;
+
     const { logout, updateCode } = useAuth();
     const wsRef = useRef<WebSocket | null>(null);
     const [status, setStatus] = useState<'connecting' | 'open' | 'closed'>('connecting');
@@ -76,7 +80,9 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                         } else if (parsed.status === 'error') {
                             logout();
                             setIsAuthenticated(false);
-                            navigate('/login', { replace: true });
+                            if (pathRef.current !== '/login') {
+                                navigate('/login', { replace: true });
+                            }
                         }
                     }
 
