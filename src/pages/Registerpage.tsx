@@ -1,22 +1,25 @@
-import {Link, Navigate, useNavigate} from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import '../styles/login.scss';
-import {type FormEvent, useEffect, useRef, useState} from "react";
-import {useWS} from "../contexts/WebSocketContext";
-import {useAuth} from "../contexts/AuthContext";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import { useWS } from "../contexts/WebSocketContext";
+import { useAuth } from "../contexts/AuthContext";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
-    const {sendEvent, lastMessage} = useWS();
-    const {username} = useAuth();
+    const { sendEvent, lastMessage } = useWS();
+    const { username } = useAuth();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [registerError, setRegisterError] = useState('');
+    const [pending, setPending] = useState(false);
     const isSent = useRef(false);
 
     useEffect(() => {
         if (!isSent.current || lastMessage?.event !== 'REGISTER') return;
         isSent.current = false;
+        setPending(false);
         if (lastMessage.status === 'success') {
             window.alert('Đăng ký thành công, bấm OK để sang trang đăng nhập');
             navigate('/login');
@@ -29,6 +32,7 @@ export default function RegisterPage() {
 
     const handleRegister = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (pending) return;
         if (!/^[a-zA-Z0-9_]+$/.test(userName.trim())) {
             setRegisterError('Tên đăng nhập chỉ gồm chữ, số và dấu gạch dưới');
             return;
@@ -37,17 +41,20 @@ export default function RegisterPage() {
             setRegisterError('Mật khẩu xác nhận không khớp');
             return;
         }
+        setPending(true);
         isSent.current = true;
-        sendEvent('REGISTER', {user: userName.trim(), pass: password});
+        sendEvent('REGISTER', { user: userName.trim(), pass: password });
     };
 
-    // đăng nhập rồi thì không vào /register
+    // Đăng nhập rồi thì không vào /register
     if (username) return <Navigate to="/chat" replace />;
 
     const inputClass = registerError ? 'form-control inputLogin is-invalid' : 'form-control inputLogin';
 
     return (
         <div className="login d-flex justify-content-center align-items-center vh-100">
+            {pending && <LoadingOverlay message="Đang đăng ký tài khoản..." />}
+
             <form className="boxLogin" onSubmit={handleRegister}>
                 <h3 className="titleLogin">Đăng ký</h3>
 
@@ -63,6 +70,7 @@ export default function RegisterPage() {
                         autoComplete="username"
                         required
                         autoFocus
+                        disabled={pending}
                         onChange={(e) => {
                             setUserName(e.target.value);
                             setRegisterError('');
@@ -81,6 +89,7 @@ export default function RegisterPage() {
                         value={password}
                         autoComplete="new-password"
                         required
+                        disabled={pending}
                         onChange={(e) => {
                             setPassword(e.target.value);
                             setRegisterError('');
@@ -99,6 +108,7 @@ export default function RegisterPage() {
                         value={confirmPassword}
                         autoComplete="new-password"
                         required
+                        disabled={pending}
                         onChange={(e) => {
                             setConfirmPassword(e.target.value);
                             setRegisterError('');
@@ -107,7 +117,13 @@ export default function RegisterPage() {
                     <div className="invalid-feedback">{registerError}</div>
                 </div>
 
-                <button type="submit" className="btn btn-primary bntLogin w-100">Đăng ký</button>
+                <button 
+                    type="submit" 
+                    className="btn btn-primary bntLogin w-100"
+                    disabled={pending}
+                >
+                    Đăng ký
+                </button>
                 <div className="mt-3 text-center">
                     Quay về trang <Link to="/login">Đăng Nhập</Link>
                 </div>
