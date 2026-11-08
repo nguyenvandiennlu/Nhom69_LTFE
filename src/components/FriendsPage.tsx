@@ -7,11 +7,13 @@ interface Props {
     onOpenChat: (chat: CurrentChat) => void;
     onAddFriend: (name: string) => void;
     addError: string;
+    onlineMap: Record<string, boolean>;
 }
-export default function FriendsPage({ friends, onOpenChat, onAddFriend, addError }: Props) {
+export default function FriendsPage({ friends, onOpenChat, onAddFriend, addError, onlineMap }: Props) {
     const [tab, setTab] = useState('all');
     const [keyword, setKeyword] = useState('');
-    const found = friends.filter((f) =>
+    const list = tab === 'online'  ? friends.filter((f) => onlineMap[f.name] === true) : friends;
+    const found = list.filter((f) =>
         f.name.toLowerCase().includes(keyword.toLowerCase())
     );
     const [newName, setNewName] = useState('');
@@ -102,6 +104,7 @@ export default function FriendsPage({ friends, onOpenChat, onAddFriend, addError
                                 >
                                     <div className={`friends__avatar friends__avatar--${colorIndex}`}>
                                         {f.name.charAt(0).toUpperCase()}
+                                        <span className={onlineMap[f.name] ? 'friends__dot friends__dot--online' : 'friends__dot'}></span>
                                     </div>
                                     <span className="friends__name flex-grow-1">{f.name}</span>
                                     <button className="friends__action" title="Nhắn tin">
@@ -111,7 +114,9 @@ export default function FriendsPage({ friends, onOpenChat, onAddFriend, addError
                             );
                         })}
                         {friends.length === 0 && (
-                            <div className="friends__empty">Danh sách bạn bè</div>
+                            <div className="friends__empty">
+                                {tab === 'online' ? 'Chưa có ai trực tuyến' : 'Không tìm thấy bạn bè nào'}
+                            </div>
                         )}
                     </>
                 )}

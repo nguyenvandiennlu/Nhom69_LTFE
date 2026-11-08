@@ -21,8 +21,20 @@ export default function ChatPage() {
     const historyFor = useRef('');
     const [showFriends, setShowFriends] = useState(true);
     const checkingUser = useRef('');
+    const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
+    const onlineQueue = useRef<string[]>([]);
+    const checkingOnline = useRef('');
     const [addError, setAddError] = useState('');
     console.log('chats:', chats);
+    const askNextOnline = () => {
+        const name = onlineQueue.current.shift();
+        if (name === undefined) {
+            checkingOnline.current = '';
+            return;
+        }
+        checkingOnline.current = name;
+        sendEvent('CHECK_USER_ONLINE', { user: name });
+    };
     useEffect(() => {
         if (isAuthenticated) {
             sendEvent('GET_USER_LIST');
@@ -82,6 +94,14 @@ export default function ChatPage() {
                 setAddError(lastMessage.mes ?? 'Có lỗi xảy ra');
             }
         }
+        if (lastMessage.event === 'CHECK_USER_ONLINE' && checkingOnline.current !== '') {
+            if (lastMessage.status === 'success') {
+                const result = lastMessage.data as { status: boolean };
+                const name = checkingOnline.current;
+                setOnlineMap((prev) => ({ ...prev, [name]: result.status }));
+            }
+            askNextOnline();
+        }
     }, [lastMessage]);
 
     useEffect(() => {
@@ -89,6 +109,12 @@ export default function ChatPage() {
         historyFor.current = currentChat.name;
         sendEvent('GET_PEOPLE_CHAT_MES', { name: currentChat.name, page: 1 });
     }, [currentChat, sendEvent]);
+    useEffect(() => {
+        if (!showFriends) return;
+        if (checkingOnline.current !== '') return;
+        onlineQueue.current = chats.filter((c) => c.type === 'people').map((c) => c.name);
+        askNextOnline();
+    }, [showFriends, chats]);
 
     const handleSend = (text: string) => {
         sendEvent('SEND_CHAT', {
@@ -144,6 +170,7 @@ export default function ChatPage() {
                         onOpenChat={handleSelectChat}
                         onAddFriend={handleAddFriend}
                         addError={addError}
+                        onlineMap={onlineMap}
                     />
                 ) : (
                 <>
