@@ -12,9 +12,10 @@ interface Props {
     onSelectChat: (chat: CurrentChat) => void;
     showFriends: boolean;
     onShowFriends: () => void;
+    onlineMap: Record<string, boolean>;
 }
 
-export default function Sidebar({ currentChat, chats, onSelectChat, showFriends, onShowFriends }: Props) {
+export default function Sidebar({ currentChat, chats, onSelectChat, showFriends, onShowFriends,onlineMap }: Props) {
     const { sendEvent } = useWS();
     const [isOpen, setIsOpen] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -65,7 +66,7 @@ export default function Sidebar({ currentChat, chats, onSelectChat, showFriends,
                         className={!showFriends && currentChat.type === 'people' && currentChat.name === person.name ? 'user userActive' : 'user'}
                         onClick={() => onSelectChat(person)}
                     >
-                        <span className="dotSidebar"></span>
+                        <span className={onlineMap[person.name] ? 'dotSidebar' : 'dotSidebar dotSidebar--offline'}></span>
                         <span>{person.name}</span>
                     </div>
                 ))}

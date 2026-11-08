@@ -162,6 +162,7 @@ export default function ChatPage() {
                 onSelectChat={handleSelectChat}
                 showFriends={showFriends}
                 onShowFriends={() => setShowFriends(true)}
+                onlineMap={onlineMap}
             />
             <main className="chat-main d-flex flex-column flex-grow-1">
                 {showFriends ? (
