@@ -1,24 +1,27 @@
-import {Link, useNavigate} from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import '../styles/login.scss';
-import {type FormEvent, useEffect, useRef, useState} from "react";
-import {useWS} from "../contexts/WebSocketContext";
-import {useAuth} from "../contexts/AuthContext";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import { useWS } from "../contexts/WebSocketContext";
+import { useAuth } from "../contexts/AuthContext";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const {status, sendEvent, lastMessage} = useWS();
-    const {login} = useAuth();
+    const { status, sendEvent, lastMessage } = useWS();
+    const { username, login } = useAuth();
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
+    const [pending, setPending] = useState(false);
     const sentUser = useRef('');
 
     useEffect(() => {
         if (!sentUser.current || lastMessage?.event !== 'LOGIN') return;
         const user = sentUser.current;
         sentUser.current = '';
+        setPending(false);
         if (lastMessage.status === 'success') {
-            const data = lastMessage.data as {RE_LOGIN_CODE: string};
+            const data = lastMessage.data as { RE_LOGIN_CODE: string };
             login(user, data.RE_LOGIN_CODE);
             navigate('/chat');
         } else {
@@ -28,17 +31,25 @@ export default function LoginPage() {
 
     const handleLogin = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (pending) return;
         if (status !== 'open') {
             setLoginError('Chưa kết nối được tới server');
             return;
         }
+        setPending(true);
         sentUser.current = userName.trim();
-        sendEvent('LOGIN', {user: userName.trim(), pass: password});
+        sendEvent('LOGIN', { user: userName.trim(), pass: password });
     };
+
+    // Đăng nhập rồi thì không vào /login
+    if (username) return <Navigate to="/chat" replace />;
+
     const inputClass = loginError ? 'form-control inputLogin is-invalid' : 'form-control inputLogin';
 
     return (
         <div className="login d-flex justify-content-center align-items-center vh-100">
+            {pending && <LoadingOverlay message="Đang đăng nhập..." />}
+
             <form className="boxLogin" onSubmit={handleLogin}>
                 <h3 className="titleLogin">Đăng nhập</h3>
 
@@ -54,6 +65,7 @@ export default function LoginPage() {
                         autoComplete="username"
                         required
                         autoFocus
+                        disabled={pending}
                         onChange={(e) => {
                             setUserName(e.target.value);
                             setLoginError('');
@@ -72,6 +84,7 @@ export default function LoginPage() {
                         value={password}
                         autoComplete="current-password"
                         required
+                        disabled={pending}
                         onChange={(e) => {
                             setPassword(e.target.value);
                             setLoginError('');
@@ -80,7 +93,13 @@ export default function LoginPage() {
                     <div className="invalid-feedback">{loginError}</div>
                 </div>
 
-                <button type="submit" className="btn btn-primary bntLogin w-100">Đăng nhập</button>
+                <button 
+                    type="submit" 
+                    className="btn btn-primary bntLogin w-100" 
+                    disabled={pending}
+                >
+                    Đăng nhập
+                </button>
                 <div className="mt-3 text-center">
                     Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
                 </div>

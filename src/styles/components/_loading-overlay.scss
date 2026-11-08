@@ -1,0 +1,21 @@
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 1000;
+    pointer-events: all;
+    cursor: wait;
+
+    &__text {
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 500;
+        margin: 0;
+        user-select: none;
+    }
+}

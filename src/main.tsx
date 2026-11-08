@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import App from './App';
@@ -8,12 +8,12 @@ import './styles/main.scss';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <BrowserRouter>
-            <WebSocketProvider>
-                <AuthProvider>
+        <HashRouter>
+            <AuthProvider>
+                <WebSocketProvider>
                     <App />
-                </AuthProvider>
-            </WebSocketProvider>
-        </BrowserRouter>
+                </WebSocketProvider>
+            </AuthProvider>
+        </HashRouter>
     </StrictMode>
 );
