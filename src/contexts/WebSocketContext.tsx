@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, useCallback } f
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { WS_URL } from '../services/config';
+import { useAuth } from './AuthContext';
 
 export interface ServerMessage {
     status?: 'success' | 'error' | string;
@@ -22,6 +23,7 @@ const WSContext = createContext<WSContextType | null>(null);
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
     const navigate = useNavigate();
+    const { logout, updateCode } = useAuth();
     const wsRef = useRef<WebSocket | null>(null);
     const [status, setStatus] = useState<'connecting' | 'open' | 'closed'>('connecting');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -69,15 +71,12 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                         isReLoggingIn.current = false;
                         const data = parsed.data as { RE_LOGIN_CODE?: string } | undefined;
                         if (parsed.status === 'success' && data?.RE_LOGIN_CODE) {
-                            localStorage.setItem('RE_LOGIN_CODE', data.RE_LOGIN_CODE);
+                            updateCode(data.RE_LOGIN_CODE);
                             setIsAuthenticated(true);
                         } else if (parsed.status === 'error') {
-                            localStorage.removeItem('currentUser');
-                            localStorage.removeItem('RE_LOGIN_CODE');
+                            logout();
                             setIsAuthenticated(false);
-                            if (window.location.pathname !== '/login') {
-                                navigate('/login');
-                            }
+                            navigate('/login', { replace: true });
                         }
                     }
 
@@ -122,7 +121,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                 wsRef.current.close();
             }
         };
-    }, [navigate]);
+    }, [navigate, logout, updateCode]);
 
     const sendEvent = useCallback((event: string, data?: object) => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
