@@ -1,11 +1,14 @@
-import { mockMembers } from '../types/TempMember';
+import type {Member} from '../types/Member';
 import MemberItem from './MemberItem';
 import { Search,X } from 'lucide-react';
 import {useState} from 'react';
 
-export default function MemberList() {
+interface Props {
+    members: Member[];
+}
+export default function MemberList({ members }: Props) {
     const [keyword, setKeyword] = useState('');
-    const foundMembers = mockMembers.filter((m) =>
+    const foundMembers = members.filter((m) =>
         m.name.toLowerCase().includes(keyword.toLowerCase())
     );
     const onlineMembers = foundMembers.filter((m) => m.status !== 'offline');
