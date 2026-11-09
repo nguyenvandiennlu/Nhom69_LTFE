@@ -69,6 +69,13 @@ export default function ChatPage() {
             const key = `people:${historyFor.current}`;
             setMessagesByChat((prev) => ({ ...prev, [key]: history }));
         }
+        if (lastMessage.event === 'GET_ROOM_CHAT_MES' && lastMessage.status === 'success') {
+            const room = lastMessage.data as { name: string; user: unknown[]; chatMess: unknown[] };
+            const history = (room.chatMess ?? []).map((item) => normalizeMessage(item));
+            history.sort((a, b) => (a.time < b.time ? -1 : 1));
+            const key = `room:${room.name}`;
+            setMessagesByChat((prev) => ({ ...prev, [key]: history }));
+        }
         if (lastMessage.event === 'CHECK_USER_EXIST') {
             if (lastMessage.status === 'success') {
                 const result = lastMessage.data as { status: boolean };
@@ -109,6 +116,11 @@ export default function ChatPage() {
         historyFor.current = currentChat.name;
         sendEvent('GET_PEOPLE_CHAT_MES', { name: currentChat.name, page: 1 });
     }, [currentChat, sendEvent]);
+    useEffect(() => {
+        if (showFriends) return;
+        if (currentChat.type !== 'room') return;
+        sendEvent('GET_ROOM_CHAT_MES', { name: currentChat.name, page: 1 });
+    }, [currentChat, showFriends, sendEvent]);
     useEffect(() => {
         if (!showFriends) return;
         if (checkingOnline.current !== '') return;
