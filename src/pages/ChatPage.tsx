@@ -176,7 +176,7 @@ export default function ChatPage() {
             id: 'own',
             name: info.own,
             // status: 'online',
-            status: onlineMap[info.own] ? 'online' : 'offline',
+            status: (info.own === username || onlineMap[info.own]) ? 'online' : 'offline',
             customStatus: 'Chủ phòng',
         });
         info.users.forEach((u) => {
@@ -184,7 +184,7 @@ export default function ChatPage() {
                 members.push({
                     id: String(u.id),
                     name: u.name,
-                    status: onlineMap[u.name] ? 'online' : 'offline',
+                    status: (u.name === username || onlineMap[u.name]) ? 'online' : 'offline',
                 });
             }
         });
