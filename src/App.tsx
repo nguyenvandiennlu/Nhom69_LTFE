@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import ChatPage from './pages/ChatPage';
-import RegisterPage from "./pages/Registerpage.tsx";
+import RegisterPage from "./pages/RegisterPage";
 import ProtectedRoute from './pages/ProtectedRoute';
 
 export default function App() {
