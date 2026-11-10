@@ -20,7 +20,21 @@ export default function ChatPage() {
     const messages = messagesByChat[currentKey] ?? [];
     const historyFor = useRef('');
     const [showFriends, setShowFriends] = useState(true);
-
+    const checkingUser = useRef('');
+    const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
+    const onlineQueue = useRef<string[]>([]);
+    const checkingOnline = useRef('');
+    const [addError, setAddError] = useState('');
+    console.log('chats:', chats);
+    const askNextOnline = () => {
+        const name = onlineQueue.current.shift();
+        if (name === undefined) {
+            checkingOnline.current = '';
+            return;
+        }
+        checkingOnline.current = name;
+        sendEvent('CHECK_USER_ONLINE', { user: name });
+    };
     useEffect(() => {
         if (isAuthenticated) {
             sendEvent('GET_USER_LIST');
@@ -55,6 +69,39 @@ export default function ChatPage() {
             const key = `people:${historyFor.current}`;
             setMessagesByChat((prev) => ({ ...prev, [key]: history }));
         }
+        if (lastMessage.event === 'CHECK_USER_EXIST') {
+            if (lastMessage.status === 'success') {
+                const result = lastMessage.data as { status: boolean };
+                const name = checkingUser.current;
+
+                if (result.status) {
+                    const newChat: CurrentChat = { name: name, type: 'people' };
+                    setChats((prev) => {
+                        const isExist = prev.some((c) => {
+                            return c.type === 'people' && c.name === name;
+                        });
+                        if (isExist) {
+                            return prev;
+                        }
+                        return [...prev, newChat];
+                    });
+                    setCurrentChat(newChat);
+                    setShowFriends(false);
+                } else {
+                    setAddError('Không tìm thấy người dùng "' + name + '"');
+                }
+            } else {
+                setAddError(lastMessage.mes ?? 'Có lỗi xảy ra');
+            }
+        }
+        if (lastMessage.event === 'CHECK_USER_ONLINE' && checkingOnline.current !== '') {
+            if (lastMessage.status === 'success') {
+                const result = lastMessage.data as { status: boolean };
+                const name = checkingOnline.current;
+                setOnlineMap((prev) => ({ ...prev, [name]: result.status }));
+            }
+            askNextOnline();
+        }
     }, [lastMessage]);
 
     useEffect(() => {
@@ -62,6 +109,12 @@ export default function ChatPage() {
         historyFor.current = currentChat.name;
         sendEvent('GET_PEOPLE_CHAT_MES', { name: currentChat.name, page: 1 });
     }, [currentChat, sendEvent]);
+    useEffect(() => {
+        if (!showFriends) return;
+        if (checkingOnline.current !== '') return;
+        onlineQueue.current = chats.filter((c) => c.type === 'people').map((c) => c.name);
+        askNextOnline();
+    }, [showFriends, chats]);
 
     const handleSend = (text: string) => {
         sendEvent('SEND_CHAT', {
@@ -95,6 +148,11 @@ export default function ChatPage() {
         setCurrentChat(chat);
         setShowFriends(false);
     };
+    const handleAddFriend = (name: string) => {
+        setAddError('');
+        checkingUser.current = name;
+        sendEvent('CHECK_USER_EXIST', { user: name });
+    };
     return (
         <div className="d-flex vh-100 overflow-hidden">
             <ServerRail />
@@ -104,10 +162,17 @@ export default function ChatPage() {
                 onSelectChat={handleSelectChat}
                 showFriends={showFriends}
                 onShowFriends={() => setShowFriends(true)}
+                onlineMap={onlineMap}
             />
             <main className="chat-main d-flex flex-column flex-grow-1">
                 {showFriends ? (
-                    <FriendsPage friends={chats.filter((c) => c.type === 'people')} onOpenChat={handleSelectChat}/>
+                    <FriendsPage
+                        friends={chats.filter((c) => c.type === 'people')}
+                        onOpenChat={handleSelectChat}
+                        onAddFriend={handleAddFriend}
+                        addError={addError}
+                        onlineMap={onlineMap}
+                    />
                 ) : (
                 <>
                     <header className="chat-main__header d-flex align-items-center gap-2">
@@ -133,7 +198,7 @@ export default function ChatPage() {
                 </>)}
 
             </main>
-            <MemberList />
+            {!showFriends && <MemberList />}
         </div>
     );
 }

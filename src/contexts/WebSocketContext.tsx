@@ -68,6 +68,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
             };
 
             ws.onmessage = (e: MessageEvent) => {
+                console.log('WS nhận:', e.data);
                 try {
                     const parsed = JSON.parse(e.data) as ServerMessage;
 
