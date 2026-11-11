@@ -150,6 +150,10 @@ export default function ChatPage() {
     };
     const handleAddFriend = (name: string) => {
         setAddError('');
+        if (name === username) {
+            setAddError('Không thể nhắn tin cho chính bạn');
+            return;
+        }
         checkingUser.current = name;
         sendEvent('CHECK_USER_EXIST', { user: name });
     };
