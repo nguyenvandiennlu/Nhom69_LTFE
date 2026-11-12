@@ -5,10 +5,11 @@ import Sidebar from '../components/Sidebar';
 import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
 import MemberList from '../components/MemberList';
-import { normalizeMessage } from '../services/messageUtils';
+import { normalizeMessage, encodeEmoji } from '../services/messageUtils';
 import { Hash, AtSign  } from 'lucide-react';
 import type { Message, CurrentChat } from '../types/message';
 import FriendsPage from '../components/FriendsPage';
+import type { Member } from '../types/Member';
 
 export default function ChatPage() {
     const { status, sendEvent, lastMessage, isAuthenticated } = useWS();
@@ -22,6 +23,7 @@ export default function ChatPage() {
     const [showFriends, setShowFriends] = useState(true);
     const checkingUser = useRef('');
     const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
+    const [roomInfo, setRoomInfo] = useState<Record<string, { own: string; users: { id: number; name: string }[] }>>({});
     const onlineQueue = useRef<string[]>([]);
     const checkingOnline = useRef('');
     const [addError, setAddError] = useState('');
@@ -48,9 +50,12 @@ export default function ChatPage() {
             const newMsg = normalizeMessage(lastMessage.data);
             const key = newMsg.type === 0
                 ? `people:${newMsg.user}` : `room:${newMsg.to}`;
-            setMessagesByChat((prev) => ({
-                ...prev,
-                [key]: [...(prev[key] ?? []), newMsg],}));
+            const isMyRoomMsg = newMsg.type === 1 && newMsg.user === username;
+            if (!isMyRoomMsg) {
+                setMessagesByChat((prev) => ({
+                    ...prev,
+                    [key]: [...(prev[key] ?? []), newMsg],}));
+            }
         }
         if (lastMessage.event === 'GET_USER_LIST' && lastMessage.status === 'success') {
             const list = lastMessage.data as { name: string; type: number ; actionTime: string}[];
@@ -68,6 +73,14 @@ export default function ChatPage() {
 
             const key = `people:${historyFor.current}`;
             setMessagesByChat((prev) => ({ ...prev, [key]: history }));
+        }
+        if (lastMessage.event === 'GET_ROOM_CHAT_MES' && lastMessage.status === 'success') {
+            const room = lastMessage.data as { name: string; own: string; userList: { id: number; name: string }[]; chatData: unknown[] };
+            const history = (room.chatData ?? []).map((item) => normalizeMessage(item));
+            history.sort((a, b) => (a.time < b.time ? -1 : 1));
+            const key = `room:${room.name}`;
+            setMessagesByChat((prev) => ({ ...prev, [key]: history }));
+            setRoomInfo((prev) => ({ ...prev, [room.name]: { own: room.own, users: room.userList ?? [] } }));
         }
         if (lastMessage.event === 'CHECK_USER_EXIST') {
             if (lastMessage.status === 'success') {
@@ -110,6 +123,11 @@ export default function ChatPage() {
         sendEvent('GET_PEOPLE_CHAT_MES', { name: currentChat.name, page: 1 });
     }, [currentChat, sendEvent]);
     useEffect(() => {
+        if (showFriends) return;
+        if (currentChat.type !== 'room') return;
+        sendEvent('GET_ROOM_CHAT_MES', { name: currentChat.name, page: 1 });
+    }, [currentChat, showFriends, sendEvent]);
+    useEffect(() => {
         if (!showFriends) return;
         if (checkingOnline.current !== '') return;
         onlineQueue.current = chats.filter((c) => c.type === 'people').map((c) => c.name);
@@ -120,22 +138,20 @@ export default function ChatPage() {
         sendEvent('SEND_CHAT', {
             type: currentChat.type,
             to: currentChat.name,
-            mes: text,
+            mes: encodeEmoji(text),
         });
-        if (currentChat.type === 'people') {
-            const myMsg: Message = {
-                id: crypto.randomUUID(),
-                user: username,
-                text: text,
-                time: new Date().toISOString(),
-                to: currentChat.name,
-                type: 0,
-            };
-            setMessagesByChat((prev) => ({
-                ...prev,
-                [currentKey]: [...(prev[currentKey] ?? []), myMsg],
-            }));
-        }
+        const myMsg: Message = {
+            id: crypto.randomUUID(),
+            user: username,
+            text: text,
+            time: new Date().toISOString(),
+            to: currentChat.name,
+            type: currentChat.type === 'room' ? 1 : 0,
+        };
+        setMessagesByChat((prev) => ({
+            ...prev,
+            [currentKey]: [...(prev[currentKey] ?? []), myMsg],
+        }));
     };
 
     const handleDelete = (id: string) => {
@@ -157,6 +173,26 @@ export default function ChatPage() {
         checkingUser.current = name;
         sendEvent('CHECK_USER_EXIST', { user: name });
     };
+    const info = roomInfo[currentChat.name];
+    const members: Member[] = [];
+    if (currentChat.type === 'room' && info) {
+        members.push({
+            id: 'own',
+            name: info.own,
+            // status: 'online',
+            status: (info.own === username || onlineMap[info.own]) ? 'online' : 'offline',
+            customStatus: 'Chủ phòng',
+        });
+        info.users.forEach((u) => {
+            if (u.name !== info.own) {
+                members.push({
+                    id: String(u.id),
+                    name: u.name,
+                    status: (u.name === username || onlineMap[u.name]) ? 'online' : 'offline',
+                });
+            }
+        });
+    }
     return (
         <div className="d-flex vh-100 overflow-hidden">
             <ServerRail />
@@ -202,7 +238,7 @@ export default function ChatPage() {
                 </>)}
 
             </main>
-            {!showFriends && <MemberList />}
+            {!showFriends && currentChat.type === 'room' && <MemberList members={members}/>}
         </div>
     );
 }
