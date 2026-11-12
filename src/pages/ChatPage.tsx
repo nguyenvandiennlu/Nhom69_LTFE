@@ -5,7 +5,7 @@ import Sidebar from '../components/Sidebar';
 import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
 import MemberList from '../components/MemberList';
-import { normalizeMessage } from '../services/messageUtils';
+import { normalizeMessage, encodeEmoji } from '../services/messageUtils';
 import { Hash, AtSign  } from 'lucide-react';
 import type { Message, CurrentChat } from '../types/message';
 import FriendsPage from '../components/FriendsPage';
@@ -138,7 +138,7 @@ export default function ChatPage() {
         sendEvent('SEND_CHAT', {
             type: currentChat.type,
             to: currentChat.name,
-            mes: text,
+            mes: encodeEmoji(text),
         });
         const myMsg: Message = {
             id: crypto.randomUUID(),
