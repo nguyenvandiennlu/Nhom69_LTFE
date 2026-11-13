@@ -10,6 +10,7 @@ import { Hash, AtSign  } from 'lucide-react';
 import type { Message, CurrentChat } from '../types/message';
 import FriendsPage from '../components/FriendsPage';
 import type { Member } from '../types/Member';
+import NewMessageNotifier from '../components/NewMessageNotifier';
 
 export default function ChatPage() {
     const { status, sendEvent, lastMessage, isAuthenticated } = useWS();
@@ -195,6 +196,7 @@ export default function ChatPage() {
     }
     return (
         <div className="d-flex vh-100 overflow-hidden">
+            <NewMessageNotifier />
             <ServerRail />
             <Sidebar 
                 currentChat={currentChat} 
