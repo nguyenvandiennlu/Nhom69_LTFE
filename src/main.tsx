@@ -1,19 +1,20 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
 import { HashRouter } from 'react-router-dom';
+import { store } from './store';
 import { WebSocketProvider } from './contexts/WebSocketContext';
-import { AuthProvider } from './contexts/AuthContext';
 import App from './App';
 import './styles/main.scss';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <HashRouter>
-            <AuthProvider>
+        <Provider store={store}>
+            <HashRouter>
                 <WebSocketProvider>
                     <App />
                 </WebSocketProvider>
-            </AuthProvider>
-        </HashRouter>
+            </HashRouter>
+        </Provider>
     </StrictMode>
 );

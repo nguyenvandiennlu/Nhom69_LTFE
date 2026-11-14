@@ -2,13 +2,15 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import '../styles/login.scss';
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useWS } from "../contexts/WebSocketContext";
-import { useAuth } from "../contexts/AuthContext";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { login } from "../store/authSlice";
 import LoadingOverlay from "../components/LoadingOverlay";
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const { status, sendEvent, lastMessage } = useWS();
-    const { username, login } = useAuth();
+    const username = useAppSelector((state) => state.auth.username);
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
@@ -22,12 +24,12 @@ export default function LoginPage() {
         setPending(false);
         if (lastMessage.status === 'success') {
             const data = lastMessage.data as { RE_LOGIN_CODE: string };
-            login(user, data.RE_LOGIN_CODE);
+            dispatch(login({ username: user, reLoginCode: data.RE_LOGIN_CODE }));
             navigate('/chat');
         } else {
             setLoginError('Tên đăng nhập hoặc mật khẩu không đúng');
         }
-    }, [lastMessage, navigate, login]);
+    }, [lastMessage, navigate, dispatch]);
 
     const handleLogin = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -41,7 +43,6 @@ export default function LoginPage() {
         sendEvent('LOGIN', { user: userName.trim(), pass: password });
     };
 
-    // Đăng nhập rồi thì không vào /login
     if (username) return <Navigate to="/chat" replace />;
 
     const inputClass = loginError ? 'form-control inputLogin is-invalid' : 'form-control inputLogin';

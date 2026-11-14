@@ -7,8 +7,6 @@ export const store = configureStore({
     },
 });
 
-// Đồng bộ auth state xuống localStorage
-// Reducer là hàm thuần, không ghi localStorage trong đó
 store.subscribe(() => {
     const { username, reLoginCode } = store.getState().auth;
     if (username) {

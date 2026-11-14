@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWS } from "../contexts/WebSocketContext";
-import { useAuth } from "../contexts/AuthContext";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { logout } from "../store/authSlice";
 import { Mic, MicOff, Headphones, HeadphoneOff, LogOut } from "lucide-react";
 
 export default function UserProfileBar() {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const { sendEvent } = useWS();
-    const { logout } = useAuth();
+    const username = useAppSelector((state) => state.auth.username);
     const [isMuted, setIsMuted] = useState(false);
     const [isDeafened, setIsDeafened] = useState(false);
 
-    const currentUser = localStorage.getItem('currentUser') || 'test1111';
+    const currentUser = username || 'test1111';
 
     const toggleMic = () => {
         setIsMuted(!isMuted);
@@ -30,7 +32,7 @@ export default function UserProfileBar() {
     const handleLogout = () => {
         if (window.confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
             sendEvent('LOGOUT');
-            logout();
+            dispatch(logout());
             navigate('/login');
         }
     };

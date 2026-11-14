@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useRef, useState, useCallback } f
 import type { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { WS_URL } from '../services/config';
-import { useAuth } from './AuthContext';
+import { store } from '../store';
+import { updateCode, setAuthenticated, logout } from '../store/authSlice';
 
 export interface ServerMessage {
     status?: 'success' | 'error' | string;
@@ -14,7 +15,6 @@ export interface ServerMessage {
 
 interface WSContextType {
     status: 'connecting' | 'open' | 'closed';
-    isAuthenticated: boolean;
     sendEvent: (event: string, data?: object) => void;
     lastMessage: ServerMessage | null;
 }
@@ -27,10 +27,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     const pathRef = useRef(location.pathname);
     pathRef.current = location.pathname;
 
-    const { logout, updateCode } = useAuth();
     const wsRef = useRef<WebSocket | null>(null);
     const [status, setStatus] = useState<'connecting' | 'open' | 'closed'>('connecting');
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [lastMessage, setLastMessage] = useState<ServerMessage | null>(null);
     const reconnectTimeoutRef = useRef<number | null>(null);
     const isUnmountedRef = useRef(false);
@@ -53,8 +51,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                     reconnectTimeoutRef.current = null;
                 }
 
-                const user = localStorage.getItem('currentUser');
-                const code = localStorage.getItem('RE_LOGIN_CODE');
+                const { username: user, reLoginCode: code } = store.getState().auth;
                 if (user && code && !isReLoggingIn.current) {
                     isReLoggingIn.current = true;
                     ws.send(JSON.stringify({
@@ -76,11 +73,10 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                         isReLoggingIn.current = false;
                         const data = parsed.data as { RE_LOGIN_CODE?: string } | undefined;
                         if (parsed.status === 'success' && data?.RE_LOGIN_CODE) {
-                            updateCode(data.RE_LOGIN_CODE);
-                            setIsAuthenticated(true);
+                            store.dispatch(updateCode(data.RE_LOGIN_CODE));
+                            store.dispatch(setAuthenticated(true));
                         } else if (parsed.status === 'error') {
-                            logout();
-                            setIsAuthenticated(false);
+                            store.dispatch(logout());
                             if (pathRef.current !== '/login') {
                                 navigate('/login', { replace: true });
                             }
@@ -88,11 +84,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                     }
 
                     if (parsed.event === 'LOGIN' && parsed.status === 'success') {
-                        setIsAuthenticated(true);
+                        store.dispatch(setAuthenticated(true));
                     }
 
                     if (parsed.event === 'LOGOUT' && parsed.status === 'success') {
-                        setIsAuthenticated(false);
+                        store.dispatch(logout());
                     }
 
                     setLastMessage(parsed);
@@ -108,7 +104,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
             ws.onclose = () => {
                 if (isUnmountedRef.current) return;
                 setStatus('closed');
-                setIsAuthenticated(false);
+                store.dispatch(setAuthenticated(false));
                 isReLoggingIn.current = false;
                 reconnectTimeoutRef.current = window.setTimeout(() => {
                     connect();
@@ -128,7 +124,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                 wsRef.current.close();
             }
         };
-    }, [navigate, logout, updateCode]);
+    }, [navigate]);
 
     const sendEvent = useCallback((event: string, data?: object) => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
@@ -141,7 +137,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     }, []);
 
     return (
-        <WSContext.Provider value={{ status, isAuthenticated, sendEvent, lastMessage }}>
+        <WSContext.Provider value={{ status, sendEvent, lastMessage }}>
             {children}
         </WSContext.Provider>
     );

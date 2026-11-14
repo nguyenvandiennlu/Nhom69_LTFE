@@ -1,4 +1,5 @@
 import { useWS } from '../contexts/WebSocketContext';
+import { useAppSelector } from '../store/hooks';
 import { useEffect, useState, useRef } from 'react';
 import ServerRail from '../components/ServerRail';
 import Sidebar from '../components/Sidebar';
@@ -13,11 +14,12 @@ import type { Member } from '../types/Member';
 import NewMessageNotifier from '../components/NewMessageNotifier';
 
 export default function ChatPage() {
-    const { status, sendEvent, lastMessage, isAuthenticated } = useWS();
+    const { status, sendEvent, lastMessage } = useWS();
+    const { isAuthenticated, username: authUsername } = useAppSelector((state) => state.auth);
     const [messagesByChat, setMessagesByChat] = useState<Record<string, Message[]>>({});
     const [currentChat, setCurrentChat] = useState<CurrentChat>({ name: 'chat-chung', type: 'room' });
     const [chats, setChats] = useState<CurrentChat[]>([]);
-    const username = localStorage.getItem('currentUser') || 'PIGGY';
+    const username = authUsername || 'PIGGY';
     const currentKey = `${currentChat.type}:${currentChat.name}`;
     const messages = messagesByChat[currentKey] ?? [];
     const historyFor = useRef('');
@@ -216,29 +218,29 @@ export default function ChatPage() {
                         onlineMap={onlineMap}
                     />
                 ) : (
-                <>
-                    <header className="chat-main__header d-flex align-items-center gap-2">
-                    <span className="chat-main__title d-flex align-items-center gap-1">
-                        {currentChat.type === 'room' ? (
-                            <Hash size={18} className="text-secondary" />
-                        ) : (
-                            <AtSign size={18} className="text-secondary" />
-                        )}
-                        {currentChat.name}
-                    </span>
-                    <span className={`chat-main__dot chat-main__dot--${status}`}></span>
-                    <span className="chat-main__status">{status}</span>
-                    </header>
+                    <>
+                        <header className="chat-main__header d-flex align-items-center gap-2">
+                            <span className="chat-main__title d-flex align-items-center gap-1">
+                                {currentChat.type === 'room' ? (
+                                    <Hash size={18} className="text-secondary" />
+                                ) : (
+                                    <AtSign size={18} className="text-secondary" />
+                                )}
+                                {currentChat.name}
+                            </span>
+                            <span className={`chat-main__dot chat-main__dot--${status}`}></span>
+                            <span className="chat-main__status">{status}</span>
+                        </header>
 
-                    <MessageList
-                        messages={messages}
-                        username={username}
-                        currentChat={currentChat}
-                        onDelete={handleDelete}
-                    />
-                    <ChatInput onSend={handleSend} currentChat={currentChat} />
-                </>)}
-
+                        <MessageList
+                            messages={messages}
+                            username={username}
+                            currentChat={currentChat}
+                            onDelete={handleDelete}
+                        />
+                        <ChatInput onSend={handleSend} currentChat={currentChat} />
+                    </>
+                )}
             </main>
             {!showFriends && currentChat.type === 'room' && <MemberList members={members}/>}
         </div>

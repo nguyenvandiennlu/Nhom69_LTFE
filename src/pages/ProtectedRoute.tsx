@@ -1,15 +1,13 @@
 import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { useWS } from '../contexts/WebSocketContext';
-import { useAuth } from '../contexts/AuthContext';
+import { useAppSelector } from '../store/hooks';
 import LoadingOverlay from '../components/LoadingOverlay';
 
 const CONNECTION_TIMEOUT = 10_000;
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
-    const { isAuthenticated } = useWS();
-    const { username } = useAuth();
+    const { isAuthenticated, username } = useAppSelector((state) => state.auth);
     const hasSession = !!username || !!localStorage.getItem('currentUser');
     const [timedOut, setTimedOut] = useState(false);
 
@@ -20,10 +18,8 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
         return () => clearTimeout(timer);
     }, [isAuthenticated, hasSession]);
 
-    // ko có session trong localStorage / AuthContext tu quay ve /login
     if (!hasSession) return <Navigate to="/login" replace />;
 
-    // Co session nhung  bat buoc phai xac thuc moi cho vo
     if (!isAuthenticated) {
         if (timedOut) {
             return (
@@ -59,6 +55,5 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
         return <LoadingOverlay message="Đang đăng nhập lại..." />;
     }
 
-    // da xac thuc thi tu dong vo /chat
     return <>{children}</>;
 }
