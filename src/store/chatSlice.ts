@@ -72,18 +72,12 @@ const chatSlice = createSlice({
                 visible.forEach((m) => map.set(m.id, m));
                 current.forEach((m) => map.set(m.id, m));
             } else {
+                current.forEach((m) => map.set(m.id, m));
                 visible.forEach((m) => map.set(m.id, m));
-                history.forEach((m) => map.set(m.id, m));
             }
 
             const merged = Array.from(map.values()).sort((a, b) => (a.time < b.time ? -1 : 1));
             state.messagesByChat[key] = merged;
-        },
-        deleteMessage(state, action: PayloadAction<{ key: string; id: string }>) {
-            const { key, id } = action.payload;
-            if (state.messagesByChat[key]) {
-                state.messagesByChat[key] = state.messagesByChat[key].filter((m) => m.id !== id);
-            }
         },
         hideMessage(state, action: PayloadAction<{ key: string; id: string }>) {
             const { key, id } = action.payload;
@@ -141,7 +135,6 @@ export const {
     shiftHistoryQueue,
     addMessage,
     setHistory,
-    deleteMessage,
     setChats,
     addChat,
     setCurrentChat,

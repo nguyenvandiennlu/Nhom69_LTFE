@@ -9,6 +9,8 @@ export const store = configureStore({
     },
 });
 
+let lastHiddenIds = store.getState().chat.hiddenIds;
+
 store.subscribe(() => {
     const { username, reLoginCode } = store.getState().auth;
     if (username) {
@@ -17,6 +19,13 @@ store.subscribe(() => {
     } else {
         localStorage.removeItem('currentUser');
         localStorage.removeItem('RE_LOGIN_CODE');
+    }
+    const hiddenIds = store.getState().chat.hiddenIds;
+    if (hiddenIds !== lastHiddenIds) {
+        lastHiddenIds = hiddenIds;
+        if (username) {
+            localStorage.setItem('hiddenIds:' + username, JSON.stringify(hiddenIds));
+        }
     }
 });
 
