@@ -136,7 +136,7 @@ export default function ChatPage() {
         dispatch(addMessage({ message: myMsg, currentUsername: username }));
     };
 
-    const handleDelete = (id: string) => {
+    const handleHide = (id: string) => {
         dispatch(hideMessage({ key: currentKey, id }));
     };
 
@@ -214,7 +214,7 @@ export default function ChatPage() {
                             messages={messages}
                             username={username}
                             currentChat={currentChat}
-                            onDelete={handleDelete}
+                            onHide={handleHide}
                         />
                         <ChatInput onSend={handleSend} currentChat={currentChat} />
                     </>

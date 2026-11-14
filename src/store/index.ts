@@ -20,6 +20,7 @@ store.subscribe(() => {
         localStorage.removeItem('currentUser');
         localStorage.removeItem('RE_LOGIN_CODE');
     }
+
     const hiddenIds = store.getState().chat.hiddenIds;
     if (hiddenIds !== lastHiddenIds) {
         lastHiddenIds = hiddenIds;

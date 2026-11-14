@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import type { Message } from '../types/message';
-import { Reply, Copy, Check, Trash2 } from 'lucide-react';
+import { Reply, Copy, Check, EyeOff } from 'lucide-react';
 
 interface Props {
     message: Message;
     isOwn: boolean;
     isGrouped: boolean;
-    onDelete?: (id: string) => void;
+    onHide?: (id: string) => void;
 }
 
-export default function MessageItem({ message, isOwn, isGrouped, onDelete }: Props) {
+export default function MessageItem({ message, isOwn, isGrouped, onHide }: Props) {
     const [copied, setCopied] = useState(false);
     const colorIndex = message.user.charCodeAt(0) % 5;
 
@@ -23,9 +23,9 @@ export default function MessageItem({ message, isOwn, isGrouped, onDelete }: Pro
         }
     };
 
-    const handleDelete = () => {
-        if (window.confirm('Bạn có chắc muốn xóa tin nhắn này không?')) {
-            onDelete?.(message.id);
+    const handleHide = () => {
+        if (window.confirm('Bạn có chắc muốn ẩn tin nhắn này không?')) {
+            onHide?.(message.id);
         }
     };
 
@@ -71,9 +71,9 @@ export default function MessageItem({ message, isOwn, isGrouped, onDelete }: Pro
                 <button 
                     className="message__action message__action--danger" 
                     title="Xóa" 
-                    onClick={handleDelete}
+                    onClick={handleHide}
                 >
-                    <Trash2 size={16} />
+                    <EyeOff size={16} />
                 </button>
             </div>
         </div>
