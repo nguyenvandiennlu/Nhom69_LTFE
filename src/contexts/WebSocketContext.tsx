@@ -4,6 +4,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { WS_URL } from '../services/config';
 import { store } from '../store';
 import { updateCode, setAuthenticated, logout } from '../store/authSlice';
+import {
+    addMessage,
+    setHistory,
+    setChats,
+    setRoomInfo,
+    shiftHistoryQueue,
+} from '../store/chatSlice';
+import { normalizeMessage } from '../services/messageUtils';
+import type { CurrentChat } from '../types/message';
 
 export interface ServerMessage {
     status?: 'success' | 'error' | string;
@@ -89,6 +98,55 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 
                     if (parsed.event === 'LOGOUT' && parsed.status === 'success') {
                         store.dispatch(logout());
+                    }
+
+                    if (parsed.event === 'SEND_CHAT' && parsed.status === 'success') {
+                        const newMsg = normalizeMessage(parsed.data);
+                        const currentUsername = store.getState().auth.username;
+                        const isMyRoomMsg = newMsg.type === 1 && newMsg.user === currentUsername;
+                        if (!isMyRoomMsg) {
+                            store.dispatch(addMessage({ message: newMsg, currentUsername }));
+                        }
+                    }
+
+                    if (parsed.event === 'GET_USER_LIST' && parsed.status === 'success') {
+                        const list = parsed.data as { name: string; type: number; actionTime: string }[];
+                        const sorted = [...list].sort((a, b) => (a.actionTime < b.actionTime ? 1 : -1));
+                        const newChats: CurrentChat[] = sorted.map((item) => ({
+                            name: item.name,
+                            type: item.type === 1 ? 'room' : 'people',
+                        }));
+                        store.dispatch(setChats(newChats));
+                    }
+
+                    if (parsed.event === 'GET_PEOPLE_CHAT_MES' && parsed.status === 'success') {
+                        const list = parsed.data as unknown[];
+                        const history = list.map((item) => normalizeMessage(item));
+                        const queue = store.getState().chat.pendingHistoryQueue;
+                        const key = queue[0] ?? '';
+                        store.dispatch(shiftHistoryQueue());
+                        if (key) {
+                            store.dispatch(setHistory({ key, history, page: 1 }));
+                        }
+                    }
+
+                    if (parsed.event === 'GET_ROOM_CHAT_MES' && parsed.status === 'success') {
+                        const room = parsed.data as {
+                            name: string;
+                            own: string;
+                            userList: { id: number; name: string }[];
+                            chatData: unknown[];
+                        };
+                        const history = (room.chatData ?? []).map((item) => normalizeMessage(item));
+                        const key = `room:${room.name}`;
+                        store.dispatch(setHistory({ key, history, page: 1 }));
+                        store.dispatch(
+                            setRoomInfo({
+                                roomName: room.name,
+                                own: room.own,
+                                users: room.userList ?? [],
+                            })
+                        );
                     }
 
                     setLastMessage(parsed);
