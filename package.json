@@ -12,11 +12,13 @@
     "sass:watch": "sass --watch src/styles:src/styles --load-path=node_modules --source-map"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.14.0",
     "bootstrap": "^5.3.8",
     "emoji-picker-react": "^5.1.4",
     "lucide-react": "^1.66.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-redux": "^9.3.1",
     "react-router-dom": "^7.18.4",
     "react-spinners": "^0.17.1"
   },
