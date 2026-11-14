@@ -31,6 +31,16 @@ export default function LoginPage() {
         }
     }, [lastMessage, navigate, dispatch]);
 
+    useEffect(() => {
+        if (!pending) return;
+        const timer = setTimeout(() => {
+            sentUser.current = '';
+            setPending(false);
+            setLoginError('Máy chủ không phản hồi, hãy thử lại sau');
+        }, 10000);
+        return () => clearTimeout(timer);
+    }, [pending]);
+
     const handleLogin = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (pending) return;
@@ -94,9 +104,9 @@ export default function LoginPage() {
                     <div className="invalid-feedback">{loginError}</div>
                 </div>
 
-                <button 
-                    type="submit" 
-                    className="btn btn-primary bntLogin w-100" 
+                <button
+                    type="submit"
+                    className="btn btn-primary bntLogin w-100"
                     disabled={pending}
                 >
                     Đăng nhập
