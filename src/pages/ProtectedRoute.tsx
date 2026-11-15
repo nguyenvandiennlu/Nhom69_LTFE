@@ -1,12 +1,14 @@
 import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { useAppSelector } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { logout } from '../store/authSlice';
 import LoadingOverlay from '../components/LoadingOverlay';
 
 const CONNECTION_TIMEOUT = 10_000;
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
+    const dispatch = useAppDispatch();
     const { isAuthenticated, username } = useAppSelector((state) => state.auth);
     const hasSession = !!username || !!localStorage.getItem('currentUser');
     const [timedOut, setTimedOut] = useState(false);
@@ -40,11 +42,7 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
                         </button>
                         <button
                             className="btn btn-outline-light"
-                            onClick={() => {
-                                localStorage.removeItem('currentUser');
-                                localStorage.removeItem('RE_LOGIN_CODE');
-                                window.location.href = '/login';
-                            }}
+                            onClick={() => dispatch(logout())}
                         >
                             Về trang đăng nhập
                         </button>

@@ -30,6 +30,16 @@ export default function RegisterPage() {
         }
     }, [lastMessage, navigate]);
 
+    useEffect(() => {
+        if (!pending) return;
+        const timer = setTimeout(() => {
+            isSent.current = false;
+            setPending(false);
+            setRegisterError('Máy chủ không phản hồi, hãy thử lại sau');
+        }, 10000);
+        return () => clearTimeout(timer);
+    }, [pending]);
+
     const handleRegister = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (pending) return;
@@ -116,8 +126,8 @@ export default function RegisterPage() {
                     <div className="invalid-feedback">{registerError}</div>
                 </div>
 
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     className="btn btn-primary bntLogin w-100"
                     disabled={pending}
                 >
