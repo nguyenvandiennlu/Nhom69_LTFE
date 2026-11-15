@@ -7,6 +7,7 @@ export const store = configureStore({
         auth: authReducer,
         chat: chatReducer,
     },
+    devTools: true,
 });
 
 let lastHiddenIds = store.getState().chat.hiddenIds;

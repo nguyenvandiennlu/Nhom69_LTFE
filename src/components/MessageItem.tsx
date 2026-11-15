@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Message } from '../types/message';
 import { Reply, Copy, Check, EyeOff } from 'lucide-react';
+import ConfirmDialog from './ConfirmDialog';
 
 interface Props {
     message: Message;
@@ -11,6 +12,7 @@ interface Props {
 
 export default function MessageItem({ message, isOwn, isGrouped, onHide }: Props) {
     const [copied, setCopied] = useState(false);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const colorIndex = message.user.charCodeAt(0) % 5;
 
     const handleCopy = async () => {
@@ -22,60 +24,75 @@ export default function MessageItem({ message, isOwn, isGrouped, onHide }: Props
             console.error('Không thể sao chép tin nhắn:', err);
         }
     };
-
     const handleHide = () => {
-        if (window.confirm('Bạn có chắc muốn ẩn tin nhắn này không?')) {
-            onHide?.(message.id);
-        }
+        setIsConfirmOpen(true);
+    };
+    const handleConfirmHide = () => {
+        onHide?.(message.id);
+        setIsConfirmOpen(false);
+    };
+    const handleCancelHide = () => {
+        setIsConfirmOpen(false);
     };
 
     return (
-        <div className={isGrouped ? "message d-flex gap-3 px-3 py-0" : "message d-flex gap-3 px-3 py-2"}>
-            {isGrouped ?
-                (<div className="message__spacer">
-                        <span className="message__spacer-time">
-                            {new Date(message.time).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                </div>)
-                :
-                (<div className={`message__avatar message__avatar--${colorIndex}`}>
-                    {message.user.charAt(0).toUpperCase()}
-                </div>)
-            }
+        <>
+            <div className={isGrouped ? "message d-flex gap-3 px-3 py-0" : "message d-flex gap-3 px-3 py-2"}>
+                {isGrouped ?
+                    (<div className="message__spacer">
+                            <span className="message__spacer-time">
+                                {new Date(message.time).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                    </div>)
+                    :
+                    (<div className={`message__avatar message__avatar--${colorIndex}`}>
+                        {message.user.charAt(0).toUpperCase()}
+                    </div>)
+                }
 
-            <div className="message__body">
-                {!isGrouped && (
-                    <div>
-                        <span className={isOwn ? 'message__name message__name--own' : 'message__name'}>
-                            {message.user}
-                        </span>
-                        <span className="message__time ms-2">
-                            {new Date(message.time).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                    </div>
-                )}
-                <div className="message__text">{message.text}</div>
-            </div>
+                <div className="message__body">
+                    {!isGrouped && (
+                        <div>
+                            <span className={isOwn ? 'message__name message__name--own' : 'message__name'}>
+                                {message.user}
+                            </span>
+                            <span className="message__time ms-2">
+                                {new Date(message.time).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                        </div>
+                    )}
+                    <div className="message__text">{message.text}</div>
+                </div>
 
-            <div className="message__toolbar">
-                <button className="message__action" title="Trả lời">
-                    <Reply size={16} />
-                </button>
-                <button 
-                    className="message__action" 
-                    title={copied ? "Đã sao chép!" : "Sao chép"} 
-                    onClick={handleCopy}
-                >
-                    {copied ? <Check size={16} color="#23a55a" /> : <Copy size={16} />}
-                </button>
-                <button 
-                    className="message__action message__action--danger" 
-                    title="Xóa" 
-                    onClick={handleHide}
-                >
-                    <EyeOff size={16} />
-                </button>
+                <div className="message__toolbar">
+                    <button className="message__action" title="Trả lời">
+                        <Reply size={16} />
+                    </button>
+                    <button
+                        className="message__action"
+                        title={copied ? "Đã sao chép!" : "Sao chép"}
+                        onClick={handleCopy}
+                    >
+                        {copied ? <Check size={16} color="#23a55a" /> : <Copy size={16} />}
+                    </button>
+                    <button
+                        className="message__action message__action--danger"
+                        title="Xóa"
+                        onClick={handleHide}
+                    >
+                        <EyeOff size={16} />
+                    </button>
+                </div>
             </div>
-        </div>
+            <ConfirmDialog
+                isOpen={isConfirmOpen}
+                title="Ẩn tin nhắn"
+                message="Bạn có chắc muốn ẩn tin nhắn này không?"
+                confirmText="Đồng ý"
+                cancelText="Hủy"
+                onConfirm={handleConfirmHide}
+                onCancel={handleCancelHide}
+            />
+        </>
     );
 }
