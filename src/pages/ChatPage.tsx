@@ -4,10 +4,11 @@ import {
     EMPTY_MESSAGES,
     addChat,
     addMessage,
-    deleteMessage,
+    hideMessage,
     pushHistoryQueue,
     setAddError,
     setCurrentChat,
+    setHiddenIds,
     setOnlineStatus,
     setShowFriends,
 } from '../store/chatSlice';
@@ -109,6 +110,15 @@ export default function ChatPage() {
         askNextOnline();
     }, [showFriends, chats]);
 
+    useEffect(() => {
+        if (!authUsername) return;
+        try {
+            const saved = JSON.parse(localStorage.getItem('hiddenIds:' + authUsername) ?? '[]');
+            dispatch(setHiddenIds(Array.isArray(saved) ? saved : []));
+        } catch {
+            dispatch(setHiddenIds([]));
+        }
+    }, [authUsername, dispatch]);
     const handleSend = (text: string) => {
         sendEvent('SEND_CHAT', {
             type: currentChat.type,
@@ -126,8 +136,8 @@ export default function ChatPage() {
         dispatch(addMessage({ message: myMsg, currentUsername: username }));
     };
 
-    const handleDelete = (id: string) => {
-        dispatch(deleteMessage({ key: currentKey, id }));
+    const handleHide = (id: string) => {
+        dispatch(hideMessage({ key: currentKey, id }));
     };
 
     const handleSelectChat = (chat: CurrentChat) => {
@@ -204,7 +214,7 @@ export default function ChatPage() {
                             messages={messages}
                             username={username}
                             currentChat={currentChat}
-                            onDelete={handleDelete}
+                            onHide={handleHide}
                         />
                         <ChatInput onSend={handleSend} currentChat={currentChat} />
                     </>

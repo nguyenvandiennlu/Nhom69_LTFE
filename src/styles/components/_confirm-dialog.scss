@@ -1,0 +1,27 @@
+@use '../base/colors' as *;
+
+// ConfirmDialog.tsx
+.confirm-dialog {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1060;
+
+  &__box {
+    width: 400px;
+    max-width: 90vw;
+    background: $body-bg-dark;
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+  }
+}
