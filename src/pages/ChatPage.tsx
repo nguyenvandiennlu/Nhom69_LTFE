@@ -12,14 +12,14 @@ import {
     setOnlineStatus,
     setShowFriends,
 } from '../store/chatSlice';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ServerRail from '../components/ServerRail';
 import Sidebar from '../components/Sidebar';
 import MessageList from '../components/MessageList';
 import ChatInput from '../components/ChatInput';
 import MemberList from '../components/MemberList';
 import { encodeEmoji } from '../services/messageUtils';
-import { Hash, AtSign } from 'lucide-react';
+import { Hash, AtSign, Menu, Users } from 'lucide-react';
 import type { Message, CurrentChat } from '../types/message';
 import FriendsPage from '../components/FriendsPage';
 import type { Member } from '../types/Member';
@@ -40,6 +40,10 @@ export default function ChatPage() {
     const username = authUsername || 'PIGGY';
     const currentKey = `${currentChat.type}:${currentChat.name}`;
     const messages = useAppSelector((s) => s.chat.messagesByChat[currentKey] ?? EMPTY_MESSAGES);
+
+    // mobile: mở/đóng drawer
+    const [navOpen, setNavOpen] = useState(false);
+    const [membersOpen, setMembersOpen] = useState(false);
 
     const checkingUser = useRef('');
     const onlineQueue = useRef<string[]>([]);
@@ -142,6 +146,8 @@ export default function ChatPage() {
 
     const handleSelectChat = (chat: CurrentChat) => {
         dispatch(setCurrentChat(chat));
+        setNavOpen(false);
+        setMembersOpen(false);
     };
 
     const handleAddFriend = (name: string) => {
@@ -175,18 +181,52 @@ export default function ChatPage() {
     }
 
     return (
-        <div className="d-flex vh-100 overflow-hidden">
+        <div className="chat-page d-flex vh-100 overflow-hidden">
             <NewMessageNotifier />
-            <ServerRail />
-            <Sidebar
-                currentChat={currentChat}
-                chats={chats}
-                onSelectChat={handleSelectChat}
-                showFriends={showFriends}
-                onShowFriends={() => dispatch(setShowFriends(true))}
-                onlineMap={onlineMap}
+            <div
+                className={`chat-backdrop ${navOpen || membersOpen ? 'chat-backdrop--show' : ''}`}
+                onClick={() => {
+                    setNavOpen(false);
+                    setMembersOpen(false);
+                }}
             />
+            <div className={`chat-nav ${navOpen ? 'chat-nav--open' : ''}`}>
+                <ServerRail />
+                <Sidebar
+                    currentChat={currentChat}
+                    chats={chats}
+                    onSelectChat={handleSelectChat}
+                    showFriends={showFriends}
+                    onShowFriends={() => {
+                        dispatch(setShowFriends(true));
+                        setNavOpen(false);
+                    }}
+                    onlineMap={onlineMap}
+                />
+            </div>
             <main className="chat-main d-flex flex-column flex-grow-1">
+                <div className="chat-mobile-bar">
+                    <button type="button" className="chat-mobile-bar__btn" title="Menu" onClick={() => setNavOpen(true)}>
+                        <Menu size={22} />
+                    </button>
+                    {!showFriends && (
+                        <span className="chat-mobile-bar__title">
+                            {currentChat.type === 'room' ? (
+                                <Hash size={18} className="text-secondary flex-shrink-0" />
+                            ) : (
+                                <AtSign size={18} className="text-secondary flex-shrink-0" />
+                            )}
+                            <span className="chat-mobile-bar__name">{currentChat.name}</span>
+                            <span className={`chat-main__dot chat-main__dot--${status} flex-shrink-0`}></span>
+                        </span>
+                    )}
+                    {showFriends && <span className="flex-grow-1"></span>}
+                    {!showFriends && currentChat.type === 'room' && (
+                        <button type="button" className="chat-mobile-bar__btn" title="Thành viên" onClick={() => setMembersOpen(true)}>
+                            <Users size={20} />
+                        </button>
+                    )}
+                </div>
                 {showFriends ? (
                     <FriendsPage
                         friends={chats.filter((c) => c.type === 'people')}
@@ -220,7 +260,11 @@ export default function ChatPage() {
                     </>
                 )}
             </main>
-            {!showFriends && currentChat.type === 'room' && <MemberList members={members} />}
+            {!showFriends && currentChat.type === 'room' && (
+                <div className={`chat-members ${membersOpen ? 'chat-members--open' : ''}`}>
+                    <MemberList members={members} />
+                </div>
+            )}
         </div>
     );
 }
