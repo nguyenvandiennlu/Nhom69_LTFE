@@ -7,7 +7,7 @@ import LoadingOverlay from "../components/LoadingOverlay";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
-    const { sendEvent, lastMessage } = useWS();
+    const { status, sendEvent, lastMessage } = useWS();
     const username = useAppSelector((state) => state.auth.username);
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
@@ -49,6 +49,10 @@ export default function RegisterPage() {
         }
         if (password !== confirmPassword) {
             setRegisterError('Mật khẩu xác nhận không khớp');
+            return;
+        }
+        if (status !== 'open') {
+            setRegisterError('Chưa kết nối được tới server');
             return;
         }
         setPending(true);
