@@ -5,6 +5,7 @@ import { useWS } from "../contexts/WebSocketContext";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { login } from "../store/authSlice";
 import LoadingOverlay from "../components/LoadingOverlay";
+import PasswordInput from "../components/PasswordInput";
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -71,7 +72,7 @@ export default function LoginPage() {
                     <input
                         id="userName"
                         type="text"
-                        className={inputClass}
+                        className={`${inputClass} userLogin`}
                         value={userName}
                         autoComplete="username"
                         required
@@ -88,20 +89,18 @@ export default function LoginPage() {
                     <label className="lableLogin" htmlFor="password">
                         Mật khẩu <span className="starLogin">*</span>
                     </label>
-                    <input
+                    <PasswordInput
                         id="password"
-                        type="password"
                         className={inputClass}
                         value={password}
                         autoComplete="current-password"
-                        required
                         disabled={pending}
                         onChange={(e) => {
                             setPassword(e.target.value);
                             setLoginError('');
                         }}
                     />
-                    <div className="invalid-feedback">{loginError}</div>
+                    {loginError && <div className="invalid-feedback d-block">{loginError}</div>}
                 </div>
 
                 <button

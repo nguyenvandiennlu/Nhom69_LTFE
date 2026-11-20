@@ -69,3 +69,50 @@ $danger: #f23f43;
     background: darken($primary, 6%);
   }
 }
+
+//PasswordInput.tsx
+$toggle-width: 32px;
+$toggle-gap: 8px;
+
+.passwordLogin {
+  display: flex;
+  align-items: center;
+  gap: $toggle-gap;
+
+  .inputLogin {
+    flex: 1;
+    min-width: 0;
+
+    // show/hide password
+    &::-ms-reveal,
+    &::-ms-clear {
+      display: none;
+    }
+  }
+}
+
+.toggleLogin {
+  flex-shrink: 0;
+  width: $toggle-width;
+  height: $toggle-width;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: #b5bac1;
+  cursor: pointer;
+
+  &:hover:not(:disabled){
+    color: #fff;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+//class bên phải ô nhập tên đnhập
+.inputLogin.userLogin {
+  width: calc(100% - #{$toggle-width + $toggle-gap});
+}
