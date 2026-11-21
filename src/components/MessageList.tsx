@@ -54,12 +54,9 @@ export default function MessageList({ messages, username, currentChat, onHide }:
                 let isGrouped = false;
                 if (i > 0 && m.user === messages[i - 1].user && day === prevDay) {
                     const gap = new Date(m.time).getTime() - new Date(messages[i - 1].time).getTime();
-                    if (gap < 5 * 60 * 1000) {
+                    if (gap >= 0 && gap < 5 * 60 * 1000) {
                         isGrouped = true;
                     }
-                }
-                if (i > 0 && m.user === messages[i - 1].user && day === prevDay) {
-                    isGrouped = true;
                 }
 
                 return (
