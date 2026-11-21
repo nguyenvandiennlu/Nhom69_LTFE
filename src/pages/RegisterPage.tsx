@@ -4,10 +4,11 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useWS } from "../contexts/WebSocketContext";
 import { useAppSelector } from "../store/hooks";
 import LoadingOverlay from "../components/LoadingOverlay";
+import PasswordInput from "../components/PasswordInput";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
-    const { sendEvent, lastMessage } = useWS();
+    const { status, sendEvent, lastMessage } = useWS();
     const username = useAppSelector((state) => state.auth.username);
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
@@ -30,6 +31,16 @@ export default function RegisterPage() {
         }
     }, [lastMessage, navigate]);
 
+    useEffect(() => {
+        if (!pending) return;
+        const timer = setTimeout(() => {
+            isSent.current = false;
+            setPending(false);
+            setRegisterError('Máy chủ không phản hồi, hãy thử lại sau');
+        }, 10000);
+        return () => clearTimeout(timer);
+    }, [pending]);
+
     const handleRegister = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (pending) return;
@@ -39,6 +50,10 @@ export default function RegisterPage() {
         }
         if (password !== confirmPassword) {
             setRegisterError('Mật khẩu xác nhận không khớp');
+            return;
+        }
+        if (status !== 'open') {
+            setRegisterError('Chưa kết nối được tới server');
             return;
         }
         setPending(true);
@@ -64,7 +79,7 @@ export default function RegisterPage() {
                     <input
                         id="userName"
                         type="text"
-                        className={inputClass}
+                        className={`${inputClass} userLogin`}
                         value={userName}
                         autoComplete="username"
                         required
@@ -81,13 +96,11 @@ export default function RegisterPage() {
                     <label className="lableLogin" htmlFor="password">
                         Mật khẩu <span className="starLogin">*</span>
                     </label>
-                    <input
+                    <PasswordInput
                         id="password"
-                        type="password"
                         className={inputClass}
                         value={password}
                         autoComplete="new-password"
-                        required
                         disabled={pending}
                         onChange={(e) => {
                             setPassword(e.target.value);
@@ -100,24 +113,22 @@ export default function RegisterPage() {
                     <label className="lableLogin" htmlFor="confirmPassword">
                         Xác nhận mật khẩu <span className="starLogin">*</span>
                     </label>
-                    <input
+                    <PasswordInput
                         id="confirmPassword"
-                        type="password"
                         className={inputClass}
                         value={confirmPassword}
                         autoComplete="new-password"
-                        required
                         disabled={pending}
                         onChange={(e) => {
                             setConfirmPassword(e.target.value);
                             setRegisterError('');
                         }}
                     />
-                    <div className="invalid-feedback">{registerError}</div>
+                    {registerError && <div className="invalid-feedback d-block">{registerError}</div>}
                 </div>
 
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     className="btn btn-primary bntLogin w-100"
                     disabled={pending}
                 >
