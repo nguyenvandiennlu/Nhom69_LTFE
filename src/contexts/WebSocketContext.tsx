@@ -119,7 +119,10 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                         store.dispatch(setChats(newChats));
                     }
 
-                    if (parsed.event === 'GET_PEOPLE_CHAT_MES' && parsed.status === 'success') {
+                    if (
+                        (parsed.event === 'GET_PEOPLE_CHAT_MES' || parsed.event === 'CHAT_PEOPLE_GET_MES') &&
+                        parsed.status === 'success'
+                    ) {
                         const list = parsed.data as unknown[];
                         const history = list.map((item) => normalizeMessage(item));
                         const queue = store.getState().chat.pendingHistoryQueue;
@@ -130,14 +133,19 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                         }
                     }
 
-                    if (parsed.event === 'GET_ROOM_CHAT_MES' && parsed.status === 'success') {
+                    if (
+                        (parsed.event === 'GET_ROOM_CHAT_MES' || parsed.event === 'JOIN_ROOM') &&
+                        parsed.status === 'success'
+                    ) {
                         const room = parsed.data as {
                             name: string;
                             own: string;
-                            userList: { id: number; name: string }[];
-                            chatData: unknown[];
+                            userList?: { id: number; name: string }[];
+                            chatData?: unknown[];
+                            chatMess?: unknown[];
                         };
-                        const history = (room.chatData ?? []).map((item) => normalizeMessage(item));
+                        const rawList = room.chatData ?? room.chatMess ?? [];
+                        const history = rawList.map((item) => normalizeMessage(item));
                         const key = `room:${room.name}`;
                         store.dispatch(setHistory({ key, history, page: 1 }));
                         store.dispatch(

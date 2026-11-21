@@ -99,6 +99,7 @@ export default function ChatPage() {
     useEffect(() => {
         if (showFriends) return;
         if (currentChat.type !== 'room') return;
+        sendEvent('JOIN_ROOM', { name: currentChat.name });
         sendEvent('GET_ROOM_CHAT_MES', { name: currentChat.name, page: 1 });
     }, [currentChat, showFriends, sendEvent]);
 
