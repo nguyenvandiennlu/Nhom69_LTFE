@@ -100,7 +100,7 @@ $mobile-max: 767.98px;
     visibility: hidden;
     transition: transform 0.2s ease, visibility 0s linear 0.2s;
     &--open {
-      transform: translateX(0);
+      transform: none;
       visibility: visible;
       transition-delay: 0s;
       box-shadow: 4px 0 16px rgba(0, 0, 0, 0.5);
@@ -134,7 +134,7 @@ $mobile-max: 767.98px;
     visibility: hidden;
     transition: transform 0.2s ease, visibility 0s linear 0.2s;
     &--open {
-      transform: translateX(0);
+      transform: none;
       visibility: visible;
       transition-delay: 0s;
       box-shadow: -4px 0 16px rgba(0, 0, 0, 0.5);
