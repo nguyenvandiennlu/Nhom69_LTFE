@@ -34,6 +34,8 @@ const WSContext = createContext<WSContextType | null>(null);
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
     const navigate = useNavigate();
+    const navigateRef = useRef(navigate);
+    navigateRef.current = navigate;
     const location = useLocation();
     const pathRef = useRef(location.pathname);
     pathRef.current = location.pathname;
@@ -42,20 +44,21 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     const [status, setStatus] = useState<'connecting' | 'open' | 'closed'>('connecting');
     const [lastMessage, setLastMessage] = useState<ServerMessage | null>(null);
     const reconnectTimeoutRef = useRef<number | null>(null);
-    const isUnmountedRef = useRef(false);
     const isReLoggingIn = useRef(false);
 
     useEffect(() => {
-        isUnmountedRef.current = false;
+        let disposed = false;
 
         function connect() {
-            if (isUnmountedRef.current) return;
+            if (disposed) return;
 
             setStatus('connecting');
             const ws = new WebSocket(WS_URL);
             wsRef.current = ws;
+            const isStale = () => disposed || ws !== wsRef.current;
 
             ws.onopen = () => {
+                if (isStale()) return;
                 setStatus('open');
                 if (reconnectTimeoutRef.current) {
                     clearTimeout(reconnectTimeoutRef.current);
@@ -76,6 +79,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
             };
 
             ws.onmessage = (e: MessageEvent) => {
+                if (isStale()) return;
                 console.log('WS nhận:', e.data);
                 try {
                     const parsed = JSON.parse(e.data) as ServerMessage;
@@ -89,7 +93,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                         } else if (parsed.status === 'error') {
                             store.dispatch(logout());
                             if (pathRef.current !== '/login') {
-                                navigate('/login', { replace: true });
+                                navigateRef.current('/login', { replace: true });
                             }
                         }
                     }
@@ -189,11 +193,12 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
             };
 
             ws.onclose = () => {
-                if (isUnmountedRef.current) return;
+                if (isStale()) return;
                 setStatus('closed');
                 store.dispatch(setAuthenticated(false));
                 isReLoggingIn.current = false;
                 reconnectTimeoutRef.current = window.setTimeout(() => {
+                    reconnectTimeoutRef.current = null;
                     connect();
                 }, 3000);
             };
@@ -202,16 +207,23 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         connect();
 
         return () => {
-            isUnmountedRef.current = true;
+            disposed = true;
             isReLoggingIn.current = false;
             if (reconnectTimeoutRef.current) {
                 clearTimeout(reconnectTimeoutRef.current);
+                reconnectTimeoutRef.current = null;
             }
-            if (wsRef.current) {
-                wsRef.current.close();
+            const ws = wsRef.current;
+            wsRef.current = null;
+            if (ws) {
+                ws.onopen = null;
+                ws.onmessage = null;
+                ws.onerror = null;
+                ws.onclose = null;
+                ws.close();
             }
         };
-    }, [navigate]);
+    }, []);
 
     const sendEvent = useCallback((event: string, data?: object) => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
