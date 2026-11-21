@@ -44,8 +44,9 @@ $danger: #f23f43;
     color: inherit;
   }
 
-  &.is-invalid,
-  &.is-invalid:focus {
+  //tắt '!' mặc định Bootstrap
+  &.form-control.is-invalid,
+  &.form-control.is-invalid:focus {
     border-color: $danger;
     background-image: none;
     padding-right: 10px;
@@ -57,6 +58,29 @@ $danger: #f23f43;
   color: $danger;
 }
 
+//báo error !
+.errorLogin {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: $danger;
+
+  &::before {
+    content: '!';
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: $danger;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
+  }
+}
 .bntLogin {
   padding: 10px;
   background: $primary;
@@ -73,15 +97,19 @@ $danger: #f23f43;
 //PasswordInput.tsx
 $toggle-width: 32px;
 $toggle-gap: 8px;
+$toggle-space: $toggle-width + $toggle-gap * 2;
 
 .passwordLogin {
-  display: flex;
-  align-items: center;
-  gap: $toggle-gap;
+  position: relative;
 
   .inputLogin {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
+    padding-right: $toggle-space;
+
+    &.form-control.is-invalid,
+    &.form-control.is-invalid:focus {
+      padding-right: $toggle-space;
+    }
 
     // show/hide password
     &::-ms-reveal,
@@ -92,9 +120,10 @@ $toggle-gap: 8px;
 }
 
 .toggleLogin {
-  flex-shrink: 0;
-  width: $toggle-width;
-  height: $toggle-width;
+  position: absolute;
+  top: 50%;
+  right: $toggle-gap;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,8 +140,4 @@ $toggle-gap: 8px;
     opacity: 0.5;
     cursor: not-allowed;
   }
-}
-//class bên phải ô nhập tên đnhập
-.inputLogin.userLogin {
-  width: calc(100% - #{$toggle-width + $toggle-gap});
 }

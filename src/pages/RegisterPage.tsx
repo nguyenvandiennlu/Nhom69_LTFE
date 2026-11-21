@@ -79,7 +79,7 @@ export default function RegisterPage() {
                     <input
                         id="userName"
                         type="text"
-                        className={`${inputClass} userLogin`}
+                        className={inputClass}
                         value={userName}
                         autoComplete="username"
                         required
@@ -124,7 +124,7 @@ export default function RegisterPage() {
                             setRegisterError('');
                         }}
                     />
-                    {registerError && <div className="invalid-feedback d-block">{registerError}</div>}
+                    {registerError && <div className="errorLogin">{registerError}</div>}
                 </div>
 
                 <button
