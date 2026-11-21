@@ -186,6 +186,18 @@ $mobile-max: 767.98px;
     }
   }
 
+  // Toast
+  body .app-toasts {
+    top: 56px;
+    bottom: auto;
+    left: 12px;
+    right: 12px;
+  }
+  .app-toast {
+    min-width: 0;
+    max-width: none;
+  }
+
   .login {
     height: auto !important;
     min-height: 100dvh;
