@@ -4,6 +4,7 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import { useWS } from "../contexts/WebSocketContext";
 import { useAppSelector } from "../store/hooks";
 import LoadingOverlay from "../components/LoadingOverlay";
+import PasswordInput from "../components/PasswordInput";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
@@ -78,7 +79,7 @@ export default function RegisterPage() {
                     <input
                         id="userName"
                         type="text"
-                        className={inputClass}
+                        className={`${inputClass} userLogin`}
                         value={userName}
                         autoComplete="username"
                         required
@@ -95,13 +96,11 @@ export default function RegisterPage() {
                     <label className="lableLogin" htmlFor="password">
                         Mật khẩu <span className="starLogin">*</span>
                     </label>
-                    <input
+                    <PasswordInput
                         id="password"
-                        type="password"
                         className={inputClass}
                         value={password}
                         autoComplete="new-password"
-                        required
                         disabled={pending}
                         onChange={(e) => {
                             setPassword(e.target.value);
@@ -114,20 +113,18 @@ export default function RegisterPage() {
                     <label className="lableLogin" htmlFor="confirmPassword">
                         Xác nhận mật khẩu <span className="starLogin">*</span>
                     </label>
-                    <input
+                    <PasswordInput
                         id="confirmPassword"
-                        type="password"
                         className={inputClass}
                         value={confirmPassword}
                         autoComplete="new-password"
-                        required
                         disabled={pending}
                         onChange={(e) => {
                             setConfirmPassword(e.target.value);
                             setRegisterError('');
                         }}
                     />
-                    <div className="invalid-feedback">{registerError}</div>
+                    {registerError && <div className="invalid-feedback d-block">{registerError}</div>}
                 </div>
 
                 <button
