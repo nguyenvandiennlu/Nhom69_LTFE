@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { Message } from '../types/message';
 import { Reply, Copy, Check, EyeOff } from 'lucide-react';
 import ConfirmDialog from './ConfirmDialog';
+import { useAppDispatch } from '../store/hooks';
+import { showToast } from '../store/uiSlice';
 
 interface Props {
     message: Message;
@@ -12,6 +14,7 @@ interface Props {
 
 export default function MessageItem({ message, isOwn, isGrouped, onHide }: Props) {
     const [copied, setCopied] = useState(false);
+    const dispatch = useAppDispatch();
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const colorIndex = message.user.charCodeAt(0) % 5;
 
@@ -20,8 +23,10 @@ export default function MessageItem({ message, isOwn, isGrouped, onHide }: Props
             await navigator.clipboard.writeText(message.text);
             setCopied(true);
             setTimeout(() => setCopied(false), 1500);
+            dispatch(showToast('Đã sao chép tin nhắn'));
         } catch (err) {
             console.error('Không thể sao chép tin nhắn:', err);
+            dispatch(showToast('Không thể sao chép tin nhắn'));
         }
     };
     const handleHide = () => {

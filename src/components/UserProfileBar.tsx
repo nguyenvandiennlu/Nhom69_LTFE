@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { logout } from "../store/authSlice";
 import { Mic, MicOff, Headphones, HeadphoneOff, LogOut } from "lucide-react";
 import ConfirmDialog from "./ConfirmDialog";
+import {showToast} from "../store/uiSlice.ts";
 
 export default function UserProfileBar() {
     const navigate = useNavigate();
@@ -38,6 +39,7 @@ export default function UserProfileBar() {
         sendEvent('LOGOUT');
         dispatch(logout());
         navigate('/login');
+        dispatch(showToast('Vĩnh biệt!'));
     };
 
     const handleCancelLogout = () => {

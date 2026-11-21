@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { login } from "../store/authSlice";
 import LoadingOverlay from "../components/LoadingOverlay";
 import PasswordInput from "../components/PasswordInput";
+import {showToast} from "../store/uiSlice.ts";
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -27,6 +28,7 @@ export default function LoginPage() {
             const data = lastMessage.data as { RE_LOGIN_CODE: string };
             dispatch(login({ username: user, reLoginCode: data.RE_LOGIN_CODE }));
             navigate('/chat');
+            dispatch(showToast('Xinh chào!'));
         } else {
             setLoginError('Tên đăng nhập hoặc mật khẩu không đúng');
         }
