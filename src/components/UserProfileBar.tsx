@@ -4,6 +4,8 @@ import { useWS } from "../contexts/WebSocketContext";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { logout } from "../store/authSlice";
 import { Mic, MicOff, Headphones, HeadphoneOff, LogOut } from "lucide-react";
+import ConfirmDialog from "./ConfirmDialog";
+import {showToast} from "../store/uiSlice.ts";
 
 export default function UserProfileBar() {
     const navigate = useNavigate();
@@ -12,7 +14,7 @@ export default function UserProfileBar() {
     const username = useAppSelector((state) => state.auth.username);
     const [isMuted, setIsMuted] = useState(false);
     const [isDeafened, setIsDeafened] = useState(false);
-
+    const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
     const currentUser = username || 'test1111';
 
     const toggleMic = () => {
@@ -30,14 +32,22 @@ export default function UserProfileBar() {
     };
 
     const handleLogout = () => {
-        if (window.confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
-            sendEvent('LOGOUT');
-            dispatch(logout());
-            navigate('/login');
-        }
+        setIsLogoutConfirmOpen(true);
+    };
+    const handleConfirmLogout = () => {
+        setIsLogoutConfirmOpen(false);
+        sendEvent('LOGOUT');
+        dispatch(logout());
+        navigate('/login');
+        dispatch(showToast('Vĩnh biệt!'));
+    };
+
+    const handleCancelLogout = () => {
+        setIsLogoutConfirmOpen(false);
     };
 
     return (
+        <>
         <div className="sidebar__user-bar">
             <div className="sidebar__user-profile" data-tooltip="Tài khoản của bạn">
                 <div className="sidebar__avatar">
@@ -79,5 +89,15 @@ export default function UserProfileBar() {
                 </button>
             </div>
         </div>
+        <ConfirmDialog
+            isOpen={isLogoutConfirmOpen}
+            title="Đăng xuất"
+            message="Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này không?"
+            confirmText="Đăng xuất"
+            cancelText="Ở lại"
+            onConfirm={handleConfirmLogout}
+            onCancel={handleCancelLogout}
+        />
+        </>
     );
 }

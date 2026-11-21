@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom';
+import { useEffect, useRef } from 'react';
 
 interface Props {
     isOpen: boolean;
@@ -11,6 +12,29 @@ interface Props {
 }
 
 export default function ConfirmDialog({ isOpen, title, message, confirmText = 'Đồng ý', cancelText = 'Hủy', onConfirm, onCancel, }: Props) {
+    const confirmButtonRef = useRef<HTMLButtonElement>(null);
+    useEffect(() => {
+        if (isOpen) {
+            confirmButtonRef.current?.focus();
+        }
+    }, [isOpen]);
+    useEffect(() => {
+        if (!isOpen) return;
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                onCancel();
+            }
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                onConfirm();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isOpen, onConfirm, onCancel]);
     if (!isOpen) return null;
     return createPortal(
         <div className="confirm-dialog" onClick={onCancel}>

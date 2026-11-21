@@ -24,7 +24,7 @@ import type { Message, CurrentChat } from '../types/message';
 import FriendsPage from '../components/FriendsPage';
 import type { Member } from '../types/Member';
 import NewMessageNotifier from '../components/NewMessageNotifier';
-
+import { showToast } from '../store/uiSlice';
 export default function ChatPage() {
     const dispatch = useAppDispatch();
     const { status, sendEvent, lastMessage } = useWS();
@@ -143,6 +143,7 @@ export default function ChatPage() {
 
     const handleHide = (id: string) => {
         dispatch(hideMessage({ key: currentKey, id }));
+        dispatch(showToast('Đã ẩn tin nhắn'));
     };
 
     const handleSelectChat = (chat: CurrentChat) => {
