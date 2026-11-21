@@ -5,7 +5,9 @@ import { WS_URL } from '../services/config';
 import { store } from '../store';
 import { updateCode, setAuthenticated, logout } from '../store/authSlice';
 import {
+    addChat,
     addMessage,
+    setCurrentChat,
     setHistory,
     setChats,
     setRoomInfo,
@@ -32,6 +34,8 @@ const WSContext = createContext<WSContextType | null>(null);
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
     const navigate = useNavigate();
+    const navigateRef = useRef(navigate);
+    navigateRef.current = navigate;
     const location = useLocation();
     const pathRef = useRef(location.pathname);
     pathRef.current = location.pathname;
@@ -40,20 +44,21 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     const [status, setStatus] = useState<'connecting' | 'open' | 'closed'>('connecting');
     const [lastMessage, setLastMessage] = useState<ServerMessage | null>(null);
     const reconnectTimeoutRef = useRef<number | null>(null);
-    const isUnmountedRef = useRef(false);
     const isReLoggingIn = useRef(false);
 
     useEffect(() => {
-        isUnmountedRef.current = false;
+        let disposed = false;
 
         function connect() {
-            if (isUnmountedRef.current) return;
+            if (disposed) return;
 
             setStatus('connecting');
             const ws = new WebSocket(WS_URL);
             wsRef.current = ws;
+            const isStale = () => disposed || ws !== wsRef.current;
 
             ws.onopen = () => {
+                if (isStale()) return;
                 setStatus('open');
                 if (reconnectTimeoutRef.current) {
                     clearTimeout(reconnectTimeoutRef.current);
@@ -74,6 +79,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
             };
 
             ws.onmessage = (e: MessageEvent) => {
+                if (isStale()) return;
                 console.log('WS nhận:', e.data);
                 try {
                     const parsed = JSON.parse(e.data) as ServerMessage;
@@ -87,7 +93,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                         } else if (parsed.status === 'error') {
                             store.dispatch(logout());
                             if (pathRef.current !== '/login') {
-                                navigate('/login', { replace: true });
+                                navigateRef.current('/login', { replace: true });
                             }
                         }
                     }
@@ -119,7 +125,10 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                         store.dispatch(setChats(newChats));
                     }
 
-                    if (parsed.event === 'GET_PEOPLE_CHAT_MES' && parsed.status === 'success') {
+                    if (
+                        (parsed.event === 'GET_PEOPLE_CHAT_MES' || parsed.event === 'CHAT_PEOPLE_GET_MES') &&
+                        parsed.status === 'success'
+                    ) {
                         const list = parsed.data as unknown[];
                         const history = list.map((item) => normalizeMessage(item));
                         const queue = store.getState().chat.pendingHistoryQueue;
@@ -130,14 +139,19 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                         }
                     }
 
-                    if (parsed.event === 'GET_ROOM_CHAT_MES' && parsed.status === 'success') {
+                    if (
+                        (parsed.event === 'GET_ROOM_CHAT_MES' || parsed.event === 'JOIN_ROOM') &&
+                        parsed.status === 'success'
+                    ) {
                         const room = parsed.data as {
                             name: string;
                             own: string;
-                            userList: { id: number; name: string }[];
-                            chatData: unknown[];
+                            userList?: { id: number; name: string }[];
+                            chatData?: unknown[];
+                            chatMess?: unknown[];
                         };
-                        const history = (room.chatData ?? []).map((item) => normalizeMessage(item));
+                        const rawList = room.chatData ?? room.chatMess ?? [];
+                        const history = rawList.map((item) => normalizeMessage(item));
                         const key = `room:${room.name}`;
                         store.dispatch(setHistory({ key, history, page: 1 }));
                         store.dispatch(
@@ -147,6 +161,25 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                                 users: room.userList ?? [],
                             })
                         );
+                    }
+
+                    if (parsed.event === 'CREATE_ROOM' && parsed.status === 'success') {
+                        const room = parsed.data as {
+                            name: string;
+                            own: string;
+                            userList?: { id: number; name: string }[];
+                        };
+                        const key = `room:${room.name}`;
+                        store.dispatch(addChat({ name: room.name, type: 'room' }));
+                        store.dispatch(
+                            setRoomInfo({
+                                roomName: room.name,
+                                own: room.own,
+                                users: room.userList ?? [],
+                            })
+                        );
+                        store.dispatch(setHistory({ key, history: [], page: 1 }));
+                        store.dispatch(setCurrentChat({ name: room.name, type: 'room' }));
                     }
 
                     setLastMessage(parsed);
@@ -160,11 +193,12 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
             };
 
             ws.onclose = () => {
-                if (isUnmountedRef.current) return;
+                if (isStale()) return;
                 setStatus('closed');
                 store.dispatch(setAuthenticated(false));
                 isReLoggingIn.current = false;
                 reconnectTimeoutRef.current = window.setTimeout(() => {
+                    reconnectTimeoutRef.current = null;
                     connect();
                 }, 3000);
             };
@@ -173,16 +207,23 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
         connect();
 
         return () => {
-            isUnmountedRef.current = true;
+            disposed = true;
             isReLoggingIn.current = false;
             if (reconnectTimeoutRef.current) {
                 clearTimeout(reconnectTimeoutRef.current);
+                reconnectTimeoutRef.current = null;
             }
-            if (wsRef.current) {
-                wsRef.current.close();
+            const ws = wsRef.current;
+            wsRef.current = null;
+            if (ws) {
+                ws.onopen = null;
+                ws.onmessage = null;
+                ws.onerror = null;
+                ws.onclose = null;
+                ws.close();
             }
         };
-    }, [navigate]);
+    }, []);
 
     const sendEvent = useCallback((event: string, data?: object) => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {

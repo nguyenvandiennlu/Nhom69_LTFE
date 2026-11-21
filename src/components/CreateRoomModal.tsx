@@ -1,19 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Hash, X } from 'lucide-react';
+import { useWS } from '../contexts/WebSocketContext';
+import { useAppSelector } from '../store/hooks';
+import { store } from '../store';
+import { normalizeRoomName } from '../services/messageUtils';
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
-    onCreateRoom: (roomName: string) => void;
 }
 
-export default function CreateRoomModal({ isOpen, onClose, onCreateRoom }: Props) {
+export default function CreateRoomModal({ isOpen, onClose }: Props) {
     const [roomName, setRoomName] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const isSubmittingRef = useRef(false);
+    const chatAtSubmit = useRef('');
+    const sentNameRef = useRef('');
+
+    const { status, sendEvent, lastMessage } = useWS();
+    const currentChat = useAppSelector((state) => state.chat.currentChat);
+
+    const handleClose = () => {
+        if (isSubmittingRef.current) return;
+        setErrorMessage('');
+        setRoomName('');
+        onClose();
+    };
+
+    useEffect(() => {
+        if (isOpen) {
+            setRoomName('');
+            setErrorMessage('');
+            setIsSubmitting(false);
+            isSubmittingRef.current = false;
+            chatAtSubmit.current = '';
+            sentNameRef.current = '';
+        }
+    }, [isOpen]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                onClose();
+            if (e.key === 'Escape' && !isSubmittingRef.current) {
+                handleClose();
             }
         };
         if (isOpen) {
@@ -22,24 +52,88 @@ export default function CreateRoomModal({ isOpen, onClose, onCreateRoom }: Props
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [isOpen, onClose]);
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (!isSubmitting) return;
+        if (
+            currentChat.type === 'room' &&
+            currentChat.name === sentNameRef.current &&
+            currentChat.name !== chatAtSubmit.current
+        ) {
+            isSubmittingRef.current = false;
+            sentNameRef.current = '';
+            chatAtSubmit.current = '';
+            setIsSubmitting(false);
+            setErrorMessage('');
+            setRoomName('');
+            onClose();
+        }
+    }, [currentChat, isSubmitting, onClose]);
+
+    useEffect(() => {
+        if (!isSubmittingRef.current || lastMessage?.event !== 'CREATE_ROOM') return;
+        if (lastMessage.status === 'error') {
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+            setErrorMessage('Không tạo được phòng. Tên có thể đã tồn tại, thử tên khác.');
+        }
+    }, [lastMessage]);
+
+    useEffect(() => {
+        if (!isSubmitting) return;
+        const timer = setTimeout(() => {
+            if (!isSubmittingRef.current) return;
+            const exists = store.getState().chat.chats.some(
+                (c) => c.type === 'room' && c.name === sentNameRef.current
+            );
+            if (exists) {
+                isSubmittingRef.current = false;
+                sentNameRef.current = '';
+                chatAtSubmit.current = '';
+                setIsSubmitting(false);
+                setErrorMessage('');
+                setRoomName('');
+                onClose();
+                return;
+            }
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+            setErrorMessage('Máy chủ không phản hồi, vui lòng thử lại sau.');
+        }, 10000);
+        return () => clearTimeout(timer);
+    }, [isSubmitting, onClose]);
 
     if (!isOpen) return null;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const trimmed = roomName.trim().replace(/\s+/g, '-').toLowerCase();
-        if (!trimmed) return;
-        onCreateRoom(trimmed);
-        setRoomName('');
-        onClose();
+        if (isSubmitting) return;
+
+        const trimmed = normalizeRoomName(roomName);
+        if (!trimmed) {
+            setErrorMessage('Tên kênh không được để trống.');
+            return;
+        }
+
+        if (status !== 'open') {
+            setErrorMessage('Chưa kết nối được tới máy chủ.');
+            return;
+        }
+
+        setErrorMessage('');
+        setIsSubmitting(true);
+        isSubmittingRef.current = true;
+        chatAtSubmit.current = currentChat.name;
+        sentNameRef.current = trimmed;
+        sendEvent('CREATE_ROOM', { name: trimmed });
     };
 
     return (
         <div 
             className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)', zIndex: 1050 }}
-            onClick={onClose}
+            onClick={handleClose}
         >
             <div 
                 className="rounded-3 overflow-hidden"
@@ -57,7 +151,8 @@ export default function CreateRoomModal({ isOpen, onClose, onCreateRoom }: Props
                     <button 
                         type="button" 
                         className="btn btn-link text-secondary p-0 text-decoration-none"
-                        onClick={onClose}
+                        onClick={handleClose}
+                        disabled={isSubmitting}
                     >
                         <X size={20} />
                     </button>
@@ -76,12 +171,22 @@ export default function CreateRoomModal({ isOpen, onClose, onCreateRoom }: Props
                             <input 
                                 type="text"
                                 className="form-control bg-transparent border-0 text-white shadow-none px-0"
-                                placeholder="kênh-mới"
+                                placeholder="kênh mới"
                                 autoFocus
                                 value={roomName}
-                                onChange={(e) => setRoomName(e.target.value)}
+                                disabled={isSubmitting}
+                                onChange={(e) => {
+                                    setRoomName(e.target.value);
+                                    setErrorMessage('');
+                                }}
                             />
                         </div>
+
+                        {errorMessage && (
+                            <div className="text-danger mt-2 fw-medium" style={{ fontSize: '13px' }}>
+                                {errorMessage}
+                            </div>
+                        )}
                     </div>
 
                     <div 
@@ -91,7 +196,8 @@ export default function CreateRoomModal({ isOpen, onClose, onCreateRoom }: Props
                         <button 
                             type="button" 
                             className="btn btn-link text-white text-decoration-none px-3"
-                            onClick={onClose}
+                            onClick={handleClose}
+                            disabled={isSubmitting}
                         >
                             Hủy
                         </button>
@@ -99,9 +205,9 @@ export default function CreateRoomModal({ isOpen, onClose, onCreateRoom }: Props
                             type="submit" 
                             className="btn btn-primary px-4 fw-medium"
                             style={{ backgroundColor: '#5865f2', borderColor: '#5865f2' }}
-                            disabled={!roomName.trim()}
+                            disabled={!roomName.trim() || isSubmitting}
                         >
-                            Tạo kênh
+                            {isSubmitting ? 'Đang tạo...' : 'Tạo kênh'}
                         </button>
                     </div>
                 </form>

@@ -23,16 +23,34 @@ export function normalizeMessage(raw: unknown): Message {
         type: typeof data.type === 'number' ? data.type : (data.type === 'room' ? 1 : 0),
     };
 }
+
+export function normalizeRoomName(name: string): string {
+    return name.trim();
+}
+
 export function encodeEmoji(text: string): string {
-    return text.replace(/[\u{10000}-\u{10FFFF}]/gu, function (ch) {
-        const code = ch.codePointAt(0);
-        return "[[u:" + code!.toString(16) + "]]";
+    if (!text) return '';
+    return text.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function (emoji) {
+        const codePoint = emoji.codePointAt(0);
+        if (codePoint !== undefined) {
+            return `[e:${codePoint.toString(16)}]`;
+        }
+        return emoji;
     });
 }
 
 export function decodeEmoji(text: string): string {
-    return text.replace(/\[\[u:([0-9a-f]+)\]\]/g, function (_, hex) {
+    if (!text) return '';
+    return text.replace(/(?:\[e:([0-9a-fA-F]+)\]|\[\[u:([0-9a-fA-F]+)\]\])/g, function (match, hex1, hex2) {
+        const hex = hex1 ?? hex2;
         const code = parseInt(hex, 16);
-        return String.fromCodePoint(code);
+        if (isNaN(code) || code < 0 || code > 0x10FFFF) {
+            return match;
+        }
+        try {
+            return String.fromCodePoint(code);
+        } catch {
+            return match;
+        }
     });
 }
