@@ -5,7 +5,9 @@ import { WS_URL } from '../services/config';
 import { store } from '../store';
 import { updateCode, setAuthenticated, logout } from '../store/authSlice';
 import {
+    addChat,
     addMessage,
+    setCurrentChat,
     setHistory,
     setChats,
     setRoomInfo,
@@ -155,6 +157,25 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
                                 users: room.userList ?? [],
                             })
                         );
+                    }
+
+                    if (parsed.event === 'CREATE_ROOM' && parsed.status === 'success') {
+                        const room = parsed.data as {
+                            name: string;
+                            own: string;
+                            userList?: { id: number; name: string }[];
+                        };
+                        const key = `room:${room.name}`;
+                        store.dispatch(addChat({ name: room.name, type: 'room' }));
+                        store.dispatch(
+                            setRoomInfo({
+                                roomName: room.name,
+                                own: room.own,
+                                users: room.userList ?? [],
+                            })
+                        );
+                        store.dispatch(setHistory({ key, history: [], page: 1 }));
+                        store.dispatch(setCurrentChat({ name: room.name, type: 'room' }));
                     }
 
                     setLastMessage(parsed);

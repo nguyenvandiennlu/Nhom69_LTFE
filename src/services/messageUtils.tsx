@@ -24,6 +24,10 @@ export function normalizeMessage(raw: unknown): Message {
     };
 }
 
+export function normalizeRoomName(name: string): string {
+    return name.trim();
+}
+
 export function encodeEmoji(text: string): string {
     if (!text) return '';
     return text.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function (emoji) {

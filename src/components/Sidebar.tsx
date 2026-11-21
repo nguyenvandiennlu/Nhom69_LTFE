@@ -3,7 +3,6 @@ import { Hash,Users  } from "lucide-react";
 import type { CurrentChat } from '../types/message';
 import UserProfileBar from "./UserProfileBar";
 import CreateRoomModal from "./CreateRoomModal";
-import { useWS } from "../contexts/WebSocketContext";
 import '../styles/sidebar.scss';
 
 interface Props {
@@ -16,17 +15,11 @@ interface Props {
 }
 
 export default function Sidebar({ currentChat, chats, onSelectChat, showFriends, onShowFriends,onlineMap }: Props) {
-    const { sendEvent } = useWS();
     const [isOpen, setIsOpen] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     const rooms = chats.filter((c) => c.type === 'room');
     const people = chats.filter((c) => c.type === 'people');
-
-    const handleCreateRoom = (roomName: string) => {
-        sendEvent('CREATE_ROOM', { name: roomName });
-        onSelectChat({ name: roomName, type: 'room' });
-    };
 
     return (
         <aside className="sidebar">
@@ -77,7 +70,6 @@ export default function Sidebar({ currentChat, chats, onSelectChat, showFriends,
             <CreateRoomModal 
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
-                onCreateRoom={handleCreateRoom}
             />
         </aside>
     );
