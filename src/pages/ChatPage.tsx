@@ -59,6 +59,24 @@ export default function ChatPage() {
         sendEvent('CHECK_USER_ONLINE', { user: name });
     };
 
+    const enqueueOnlineCheck = (names: string[]) => {
+        names.forEach((n) => {
+            if (n && n !== username && n !== checkingOnline.current && !onlineQueue.current.includes(n)) {
+                onlineQueue.current.push(n);
+            }
+        });
+        if (checkingOnline.current === '') {
+            askNextOnline();
+        }
+    };
+
+    useEffect(() => {
+        if (status !== 'open') {
+            checkingOnline.current = '';
+            onlineQueue.current = [];
+        }
+    }, [status]);
+
     useEffect(() => {
         if (isAuthenticated) {
             sendEvent('GET_USER_LIST');
@@ -110,10 +128,16 @@ export default function ChatPage() {
 
     useEffect(() => {
         if (!showFriends) return;
-        if (checkingOnline.current !== '') return;
-        onlineQueue.current = chats.filter((c) => c.type === 'people').map((c) => c.name);
-        askNextOnline();
+        enqueueOnlineCheck(chats.filter((c) => c.type === 'people').map((c) => c.name));
     }, [showFriends, chats]);
+
+    const info = roomInfo[currentChat.name];
+
+    useEffect(() => {
+        if (showFriends || currentChat.type !== 'room' || !info) return;
+        const memberNames = [info.own, ...info.users.map((u) => u.name)];
+        enqueueOnlineCheck(memberNames);
+    }, [showFriends, currentChat, info]);
 
     useEffect(() => {
         if (!authUsername) return;
@@ -167,7 +191,6 @@ export default function ChatPage() {
         sendEvent('CHECK_USER_EXIST', { user: name });
     };
 
-    const info = roomInfo[currentChat.name];
     const members: Member[] = [];
     if (currentChat.type === 'room' && info) {
         members.push({
