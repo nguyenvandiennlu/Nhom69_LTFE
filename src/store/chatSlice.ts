@@ -76,7 +76,9 @@ const chatSlice = createSlice({
                 visible.forEach((m) => map.set(m.id, m));
             }
 
-            const merged = Array.from(map.values()).sort((a, b) => (a.time < b.time ? -1 : 1));
+            const merged = Array.from(map.values()).sort(
+                (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()
+            );
             state.messagesByChat[key] = merged;
         },
         hideMessage(state, action: PayloadAction<{ key: string; id: string }>) {
