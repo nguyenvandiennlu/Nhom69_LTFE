@@ -74,7 +74,7 @@ export default function LoginPage() {
                     <input
                         id="userName"
                         type="text"
-                        className={`${inputClass} userLogin`}
+                        className={inputClass}
                         value={userName}
                         autoComplete="username"
                         required
@@ -102,7 +102,7 @@ export default function LoginPage() {
                             setLoginError('');
                         }}
                     />
-                    {loginError && <div className="invalid-feedback d-block">{loginError}</div>}
+                    {loginError && <div className="errorLogin">{loginError}</div>}
                 </div>
 
                 <button
