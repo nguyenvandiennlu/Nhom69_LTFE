@@ -125,6 +125,10 @@ export default function ChatPage() {
         }
     }, [authUsername, dispatch]);
     const handleSend = (text: string) => {
+        if (!navigator.onLine || status !== 'open') {
+            dispatch(showToast('Chưa kết nối tới máy chủ, không thể gửi tin nhắn'));
+            return false;
+        }
         sendEvent('SEND_CHAT', {
             type: currentChat.type,
             to: currentChat.name,
@@ -139,6 +143,7 @@ export default function ChatPage() {
             type: currentChat.type === 'room' ? 1 : 0,
         };
         dispatch(addMessage({ message: myMsg, currentUsername: username }));
+        return true;
     };
 
     const handleHide = (id: string) => {
