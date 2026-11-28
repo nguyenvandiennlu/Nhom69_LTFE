@@ -59,6 +59,24 @@ export default function ChatPage() {
         sendEvent('CHECK_USER_ONLINE', { user: name });
     };
 
+    const enqueueOnlineCheck = (names: string[]) => {
+        names.forEach((n) => {
+            if (n && n !== username && n !== checkingOnline.current && !onlineQueue.current.includes(n)) {
+                onlineQueue.current.push(n);
+            }
+        });
+        if (checkingOnline.current === '') {
+            askNextOnline();
+        }
+    };
+
+    useEffect(() => {
+        if (status !== 'open') {
+            checkingOnline.current = '';
+            onlineQueue.current = [];
+        }
+    }, [status]);
+
     useEffect(() => {
         if (isAuthenticated) {
             sendEvent('GET_USER_LIST');
@@ -110,10 +128,16 @@ export default function ChatPage() {
 
     useEffect(() => {
         if (!showFriends) return;
-        if (checkingOnline.current !== '') return;
-        onlineQueue.current = chats.filter((c) => c.type === 'people').map((c) => c.name);
-        askNextOnline();
+        enqueueOnlineCheck(chats.filter((c) => c.type === 'people').map((c) => c.name));
     }, [showFriends, chats]);
+
+    const info = roomInfo[currentChat.name];
+
+    useEffect(() => {
+        if (showFriends || currentChat.type !== 'room' || !info) return;
+        const memberNames = [info.own, ...info.users.map((u) => u.name)];
+        enqueueOnlineCheck(memberNames);
+    }, [showFriends, currentChat, info]);
 
     useEffect(() => {
         if (!authUsername) return;
@@ -125,6 +149,10 @@ export default function ChatPage() {
         }
     }, [authUsername, dispatch]);
     const handleSend = (text: string) => {
+        if (!navigator.onLine || status !== 'open') {
+            dispatch(showToast('Chưa kết nối tới máy chủ, không thể gửi tin nhắn'));
+            return false;
+        }
         sendEvent('SEND_CHAT', {
             type: currentChat.type,
             to: currentChat.name,
@@ -139,6 +167,7 @@ export default function ChatPage() {
             type: currentChat.type === 'room' ? 1 : 0,
         };
         dispatch(addMessage({ message: myMsg, currentUsername: username }));
+        return true;
     };
 
     const handleHide = (id: string) => {
@@ -162,7 +191,6 @@ export default function ChatPage() {
         sendEvent('CHECK_USER_EXIST', { user: name });
     };
 
-    const info = roomInfo[currentChat.name];
     const members: Member[] = [];
     if (currentChat.type === 'room' && info) {
         members.push({

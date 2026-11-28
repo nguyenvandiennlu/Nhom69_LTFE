@@ -4,7 +4,7 @@ import EmojiPickerButton from './EmojiPickerButton';
 import type { CurrentChat } from '../types/message';
 
 interface Props {
-    onSend: (text: string) => void;
+    onSend: (text: string) => boolean | void;
     currentChat: CurrentChat;
 }
 
@@ -14,8 +14,10 @@ export default function ChatInput({ onSend, currentChat }: Props) {
 
     const handleSend = () => {
         if (!text.trim()) return;
-        onSend(text);
-        setText('');
+        const sent = onSend(text);
+        if (sent !== false) {
+            setText('');
+        }
     };
 
     const handleSelectEmoji = (emoji: string) => {

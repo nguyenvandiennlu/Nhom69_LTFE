@@ -1,5 +1,16 @@
 import type { Message } from '../types/message';
 
+export function normalizeTime(raw: unknown): string {
+    if (typeof raw !== 'string' || !raw.trim()) {
+        return new Date().toISOString();
+    }
+    const trimmed = raw.trim();
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\.\d+)?$/.test(trimmed)) {
+        return trimmed.replace(' ', 'T') + 'Z';
+    }
+    return trimmed;
+}
+
 export function normalizeMessage(raw: unknown): Message {
     let data: Record<string, unknown> = {};
 
@@ -18,7 +29,7 @@ export function normalizeMessage(raw: unknown): Message {
         id: String(data.id ?? crypto.randomUUID()),
         user: String(data.name ?? data.user ?? 'Ẩn danh'),
         text: decodeEmoji(String(data.mes ?? data.text ?? '')),
-        time: String(data.createAt ?? data.time ?? new Date().toISOString()),
+        time: normalizeTime(data.createAt ?? data.time),
         to: data.to ? String(data.to) : undefined,
         type: typeof data.type === 'number' ? data.type : (data.type === 'room' ? 1 : 0),
     };
