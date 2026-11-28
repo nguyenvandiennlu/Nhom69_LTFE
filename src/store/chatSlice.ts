@@ -61,9 +61,17 @@ const chatSlice = createSlice({
             const { key, history, page = 1 } = action.payload;
             if (!key) return;
 
-            const current = state.messagesByChat[key] ?? [];
-            const map = new Map<string, Message>();
+            const current = [...(state.messagesByChat[key] ?? [])];
+            if (page === 1) {
+                history.forEach((h) => {
+                    const i = current.findIndex(
+                        (m) => m.id.includes('-') && m.user === h.user && m.text.trim() === h.text.trim()
+                    );
+                    if (i !== -1) current.splice(i, 1);
+                });
+            }
 
+            const map = new Map<string, Message>();
             if (page > 1) {
                 history.forEach((m) => map.set(m.id, m));
                 current.forEach((m) => map.set(m.id, m));
