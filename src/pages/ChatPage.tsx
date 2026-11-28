@@ -4,11 +4,9 @@ import {
     EMPTY_MESSAGES,
     addChat,
     addMessage,
-    hideMessage,
     pushHistoryQueue,
     setAddError,
     setCurrentChat,
-    setHiddenIds,
     setOnlineStatus,
     setShowFriends,
 } from '../store/chatSlice';
@@ -139,15 +137,6 @@ export default function ChatPage() {
         enqueueOnlineCheck(memberNames);
     }, [showFriends, currentChat, info]);
 
-    useEffect(() => {
-        if (!authUsername) return;
-        try {
-            const saved = JSON.parse(localStorage.getItem('hiddenIds:' + authUsername) ?? '[]');
-            dispatch(setHiddenIds(Array.isArray(saved) ? saved : []));
-        } catch {
-            dispatch(setHiddenIds([]));
-        }
-    }, [authUsername, dispatch]);
     const handleSend = (text: string) => {
         if (!navigator.onLine || status !== 'open') {
             dispatch(showToast('Chưa kết nối tới máy chủ, không thể gửi tin nhắn'));
@@ -168,11 +157,6 @@ export default function ChatPage() {
         };
         dispatch(addMessage({ message: myMsg, currentUsername: username }));
         return true;
-    };
-
-    const handleHide = (id: string) => {
-        dispatch(hideMessage({ key: currentKey, id }));
-        dispatch(showToast('Đã ẩn tin nhắn'));
     };
 
     const handleSelectChat = (chat: CurrentChat) => {
@@ -284,7 +268,6 @@ export default function ChatPage() {
                             messages={messages}
                             username={username}
                             currentChat={currentChat}
-                            onHide={handleHide}
                         />
                         <ChatInput onSend={handleSend} currentChat={currentChat} />
                     </>

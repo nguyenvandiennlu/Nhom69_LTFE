@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { Message } from '../types/message';
-import { Reply, Copy, Check, EyeOff } from 'lucide-react';
-import ConfirmDialog from './ConfirmDialog';
+import { Copy, Check } from 'lucide-react';
 import { useAppDispatch } from '../store/hooks';
 import { showToast } from '../store/uiSlice';
 
@@ -9,13 +8,11 @@ interface Props {
     message: Message;
     isOwn: boolean;
     isGrouped: boolean;
-    onHide?: (id: string) => void;
 }
 
-export default function MessageItem({ message, isOwn, isGrouped, onHide }: Props) {
+export default function MessageItem({ message, isOwn, isGrouped}: Props) {
     const [copied, setCopied] = useState(false);
     const dispatch = useAppDispatch();
-    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const colorIndex = message.user.charCodeAt(0) % 5;
 
     const handleCopy = async () => {
@@ -28,16 +25,6 @@ export default function MessageItem({ message, isOwn, isGrouped, onHide }: Props
             console.error('Không thể sao chép tin nhắn:', err);
             dispatch(showToast('Không thể sao chép tin nhắn'));
         }
-    };
-    const handleHide = () => {
-        setIsConfirmOpen(true);
-    };
-    const handleConfirmHide = () => {
-        onHide?.(message.id);
-        setIsConfirmOpen(false);
-    };
-    const handleCancelHide = () => {
-        setIsConfirmOpen(false);
     };
 
     return (
@@ -70,9 +57,6 @@ export default function MessageItem({ message, isOwn, isGrouped, onHide }: Props
                 </div>
 
                 <div className="message__toolbar">
-                    <button className="message__action" title="Trả lời">
-                        <Reply size={16} />
-                    </button>
                     <button
                         className="message__action"
                         title={copied ? "Đã sao chép!" : "Sao chép"}
@@ -80,24 +64,8 @@ export default function MessageItem({ message, isOwn, isGrouped, onHide }: Props
                     >
                         {copied ? <Check size={16} color="#23a55a" /> : <Copy size={16} />}
                     </button>
-                    <button
-                        className="message__action message__action--danger"
-                        title="Xóa"
-                        onClick={handleHide}
-                    >
-                        <EyeOff size={16} />
-                    </button>
                 </div>
             </div>
-            <ConfirmDialog
-                isOpen={isConfirmOpen}
-                title="Ẩn tin nhắn"
-                message="Bạn có chắc muốn ẩn tin nhắn này không?"
-                confirmText="Đồng ý"
-                cancelText="Hủy"
-                onConfirm={handleConfirmHide}
-                onCancel={handleCancelHide}
-            />
         </>
     );
 }

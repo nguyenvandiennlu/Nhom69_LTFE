@@ -7,10 +7,9 @@ interface Props {
     messages: Message[];
     username: string;
     currentChat: CurrentChat;
-    onHide?: (id: string) => void;
 }
 
-export default function MessageList({ messages, username, currentChat, onHide }: Props) {
+export default function MessageList({ messages, username, currentChat }: Props) {
     const bottomRef = useRef<HTMLDivElement>(null);
     const isRoom = currentChat.type === 'room';
     const prefix = isRoom ? '#' : '@';
@@ -65,8 +64,7 @@ export default function MessageList({ messages, username, currentChat, onHide }:
                         <MessageItem 
                             message={m} 
                             isOwn={m.user === username} 
-                            isGrouped={isGrouped} 
-                            onHide={onHide}
+                            isGrouped={isGrouped}
                         />
                     </Fragment>
                 );
