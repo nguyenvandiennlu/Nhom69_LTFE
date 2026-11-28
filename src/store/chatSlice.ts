@@ -12,7 +12,6 @@ export interface ChatState {
     roomInfo: Record<string, { own: string; users: { id: number; name: string }[] }>;
     addError: string;
     pendingHistoryQueue: string[];
-    hiddenIds: string[];
 }
 
 const initialState: ChatState = {
@@ -24,7 +23,6 @@ const initialState: ChatState = {
     roomInfo: {},
     addError: '',
     pendingHistoryQueue: [],
-    hiddenIds: [],
 };
 
 export const EMPTY_MESSAGES: Message[] = [];
@@ -49,7 +47,6 @@ const chatSlice = createSlice({
             }
 
             if (!key || key === 'room:' || key === 'people:') return;
-            if (state.hiddenIds.includes(msg.id)) return;
 
             if (!state.messagesByChat[key]) {
                 state.messagesByChat[key] = [];
@@ -63,35 +60,22 @@ const chatSlice = createSlice({
         setHistory(state, action: PayloadAction<{ key: string; history: Message[]; page?: number }>) {
             const { key, history, page = 1 } = action.payload;
             if (!key) return;
-            const visible = history.filter((m) => !state.hiddenIds.includes(m.id));
 
             const current = state.messagesByChat[key] ?? [];
             const map = new Map<string, Message>();
 
             if (page > 1) {
-                visible.forEach((m) => map.set(m.id, m));
+                history.forEach((m) => map.set(m.id, m));
                 current.forEach((m) => map.set(m.id, m));
             } else {
                 current.forEach((m) => map.set(m.id, m));
-                visible.forEach((m) => map.set(m.id, m));
+                history.forEach((m) => map.set(m.id, m));
             }
 
             const merged = Array.from(map.values()).sort(
                 (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()
             );
             state.messagesByChat[key] = merged;
-        },
-        hideMessage(state, action: PayloadAction<{ key: string; id: string }>) {
-            const { key, id } = action.payload;
-            if (!state.hiddenIds.includes(id)) {
-                state.hiddenIds.push(id);
-            }
-            if (state.messagesByChat[key]) {
-                state.messagesByChat[key] = state.messagesByChat[key].filter((m) => m.id !== id);
-            }
-        },
-        setHiddenIds(state, action: PayloadAction<string[]>) {
-            state.hiddenIds = action.payload;
         },
         setChats(state, action: PayloadAction<CurrentChat[]>) {
             state.chats = action.payload;
@@ -144,8 +128,6 @@ export const {
     setOnlineStatus,
     setRoomInfo,
     setAddError,
-    hideMessage,
-    setHiddenIds,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

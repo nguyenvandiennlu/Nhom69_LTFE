@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { PlusCircle, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import EmojiPickerButton from './EmojiPickerButton';
 import type { CurrentChat } from '../types/message';
 
@@ -28,9 +28,6 @@ export default function ChatInput({ onSend, currentChat }: Props) {
     return (
         <div className="chat-input px-3 pb-3">
             <div className="chat-input__bar d-flex align-items-center gap-2">
-                <button type="button" className="chat-input__icon d-flex align-items-center" title="Đính kèm">
-                    <PlusCircle size={20} />
-                </button>
                 <textarea
                     ref={textareaRef}
                     className="chat-input__field flex-grow-1"
@@ -45,7 +42,6 @@ export default function ChatInput({ onSend, currentChat }: Props) {
                     }}
                     placeholder={`Nhắn ${currentChat.type === 'room' ? '#' : '@'}${currentChat.name}`}
                 />
-                <button type="button" className="chat-input__icon chat-input__icon--gif" title="GIF">GIF</button>
                 <EmojiPickerButton onSelectEmoji={handleSelectEmoji} />
                 <button 
                     type="button"
